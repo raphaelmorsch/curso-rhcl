@@ -1,0 +1,668 @@
+[lab-user@bastion ~]$ oc get clusterversion
+NAME      VERSION   AVAILABLE   PROGRESSING   SINCE   STATUS
+version   4.20.46   True        False         26h     Cluster version is 4.20.46
+[lab-user@bastion ~]$ oc version
+Client Version: 4.20.46
+Kustomize Version: v5.6.0
+Server Version: 4.20.46
+Kubernetes Version: v1.33.13
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ oc get csv -A | grep -Ei \
+'connectivity|rhcl|kuadrant|authorino|limitador|dns-operator|servicemesh|istio|mcp|cert-manager|grafana|opentelemetry'
+ai-gateway                                         authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+ai-gateway                                         dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+ai-gateway                                         limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+ai-gateway                                         rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+assisted-installer                                 authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+assisted-installer                                 dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+assisted-installer                                 limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+assisted-installer                                 rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+cert-manager-operator                              amqstreams.v3.2.2-9                      Streams for Apache Kafka                      3.2.2-9          amqstreams.v3.2.0-8                      Succeeded
+cert-manager-operator                              authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+cert-manager-operator                              cert-manager-operator.v1.20.1            cert-manager Operator for Red Hat OpenShift   1.20.1           cert-manager-operator.v1.20.0            Succeeded
+cert-manager-operator                              devspacesoperator.v3.26.0                Red Hat OpenShift Dev Spaces                  3.26.0           devspacesoperator.v3.25.0                Succeeded
+cert-manager-operator                              devworkspace-operator.v1.0.0             DevWorkspace Operator                         1.0.0            devworkspace-operator.v0.43.0            Succeeded
+cert-manager-operator                              dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+cert-manager-operator                              limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+cert-manager-operator                              rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+cert-manager-operator                              skupper-operator.v2.1.4-rh-3             Red Hat Service Interconnect                  2.1.4-rh-3       skupper-operator.v2.1.3-rh-1             Succeeded
+cert-manager                                       amqstreams.v3.2.2-9                      Streams for Apache Kafka                      3.2.2-9          amqstreams.v3.2.0-8                      Succeeded
+cert-manager                                       authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+cert-manager                                       devspacesoperator.v3.26.0                Red Hat OpenShift Dev Spaces                  3.26.0           devspacesoperator.v3.25.0                Succeeded
+cert-manager                                       devworkspace-operator.v1.0.0             DevWorkspace Operator                         1.0.0            devworkspace-operator.v0.43.0            Succeeded
+cert-manager                                       dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+cert-manager                                       limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+cert-manager                                       rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+cert-manager                                       skupper-operator.v2.1.4-rh-3             Red Hat Service Interconnect                  2.1.4-rh-3       skupper-operator.v2.1.3-rh-1             Succeeded
+default                                            authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+default                                            dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+default                                            limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+default                                            rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+devspaces                                          authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+devspaces                                          dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+devspaces                                          limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+devspaces                                          rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+filestash                                          authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+filestash                                          dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+filestash                                          limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+filestash                                          rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+helpdesk                                           authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+helpdesk                                           dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+helpdesk                                           limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+helpdesk                                           rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+kuadrant-system                                    amqstreams.v3.2.2-9                      Streams for Apache Kafka                      3.2.2-9          amqstreams.v3.2.0-8                      Succeeded
+kuadrant-system                                    authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+kuadrant-system                                    devspacesoperator.v3.26.0                Red Hat OpenShift Dev Spaces                  3.26.0           devspacesoperator.v3.25.0                Succeeded
+kuadrant-system                                    devworkspace-operator.v1.0.0             DevWorkspace Operator                         1.0.0            devworkspace-operator.v0.43.0            Succeeded
+kuadrant-system                                    dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+kuadrant-system                                    limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+kuadrant-system                                    rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+kuadrant-system                                    skupper-operator.v2.1.4-rh-3             Red Hat Service Interconnect                  2.1.4-rh-3       skupper-operator.v2.1.3-rh-1             Succeeded
+kube-node-lease                                    authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+kube-node-lease                                    dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+kube-node-lease                                    limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+kube-node-lease                                    rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+kube-public                                        authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+kube-public                                        dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+kube-public                                        limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+kube-public                                        rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+kube-system                                        authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+kube-system                                        dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+kube-system                                        limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+kube-system                                        rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+llm-api                                            authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+llm-api                                            dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+llm-api                                            limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+llm-api                                            rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+matrix                                             authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+matrix                                             dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+matrix                                             limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+matrix                                             rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+openshift-apiserver-operator                       authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+openshift-apiserver-operator                       dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+openshift-apiserver-operator                       limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+openshift-apiserver-operator                       rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+openshift-apiserver                                authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+openshift-apiserver                                dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+openshift-apiserver                                limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+openshift-apiserver                                rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+openshift-authentication-operator                  authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+openshift-authentication-operator                  dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+openshift-authentication-operator                  limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+openshift-authentication-operator                  rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+openshift-authentication                           authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+openshift-authentication                           dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+openshift-authentication                           limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+openshift-authentication                           rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+openshift-catalogd                                 authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+openshift-catalogd                                 dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+openshift-catalogd                                 limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+openshift-catalogd                                 rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+openshift-cloud-controller-manager-operator        authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+openshift-cloud-controller-manager-operator        dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+openshift-cloud-controller-manager-operator        limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+openshift-cloud-controller-manager-operator        rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+openshift-cloud-controller-manager                 authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+openshift-cloud-controller-manager                 dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+openshift-cloud-controller-manager                 limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+openshift-cloud-controller-manager                 rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+openshift-cloud-credential-operator                authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+openshift-cloud-credential-operator                dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+openshift-cloud-credential-operator                limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+openshift-cloud-credential-operator                rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+openshift-cloud-network-config-controller          authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+openshift-cloud-network-config-controller          dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+openshift-cloud-network-config-controller          limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+openshift-cloud-network-config-controller          rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+openshift-cloud-platform-infra                     authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+openshift-cloud-platform-infra                     dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+openshift-cloud-platform-infra                     limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+openshift-cloud-platform-infra                     rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+openshift-cluster-csi-drivers                      authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+openshift-cluster-csi-drivers                      dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+openshift-cluster-csi-drivers                      limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+openshift-cluster-csi-drivers                      rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+openshift-cluster-machine-approver                 authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+openshift-cluster-machine-approver                 dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+openshift-cluster-machine-approver                 limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+openshift-cluster-machine-approver                 rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+openshift-cluster-node-tuning-operator             authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+openshift-cluster-node-tuning-operator             dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+openshift-cluster-node-tuning-operator             limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+openshift-cluster-node-tuning-operator             rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+openshift-cluster-olm-operator                     authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+openshift-cluster-olm-operator                     dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+openshift-cluster-olm-operator                     limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+openshift-cluster-olm-operator                     rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+openshift-cluster-samples-operator                 authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+openshift-cluster-samples-operator                 dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+openshift-cluster-samples-operator                 limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+openshift-cluster-samples-operator                 rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+openshift-cluster-storage-operator                 authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+openshift-cluster-storage-operator                 dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+openshift-cluster-storage-operator                 limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+openshift-cluster-storage-operator                 rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+openshift-cluster-version                          authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+openshift-cluster-version                          dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+openshift-cluster-version                          limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+openshift-cluster-version                          rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+openshift-config-managed                           authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+openshift-config-managed                           dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+openshift-config-managed                           limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+openshift-config-managed                           rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+openshift-config-operator                          authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+openshift-config-operator                          dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+openshift-config-operator                          limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+openshift-config-operator                          rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+openshift-config                                   authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+openshift-config                                   dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+openshift-config                                   limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+openshift-config                                   rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+openshift-console-operator                         authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+openshift-console-operator                         dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+openshift-console-operator                         limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+openshift-console-operator                         rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+openshift-console-user-settings                    authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+openshift-console-user-settings                    dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+openshift-console-user-settings                    limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+openshift-console-user-settings                    rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+openshift-console                                  authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+openshift-console                                  dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+openshift-console                                  limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+openshift-console                                  rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+openshift-controller-manager-operator              authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+openshift-controller-manager-operator              dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+openshift-controller-manager-operator              limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+openshift-controller-manager-operator              rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+openshift-controller-manager                       authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+openshift-controller-manager                       dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+openshift-controller-manager                       limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+openshift-controller-manager                       rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+openshift-dns-operator                             amqstreams.v3.2.2-9                      Streams for Apache Kafka                      3.2.2-9          amqstreams.v3.2.0-8                      Succeeded
+openshift-dns-operator                             authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+openshift-dns-operator                             devspacesoperator.v3.26.0                Red Hat OpenShift Dev Spaces                  3.26.0           devspacesoperator.v3.25.0                Succeeded
+openshift-dns-operator                             devworkspace-operator.v1.0.0             DevWorkspace Operator                         1.0.0            devworkspace-operator.v0.43.0            Succeeded
+openshift-dns-operator                             dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+openshift-dns-operator                             limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+openshift-dns-operator                             rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+openshift-dns-operator                             skupper-operator.v2.1.4-rh-3             Red Hat Service Interconnect                  2.1.4-rh-3       skupper-operator.v2.1.3-rh-1             Succeeded
+openshift-dns                                      authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+openshift-dns                                      dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+openshift-dns                                      limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+openshift-dns                                      rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+openshift-etcd-operator                            authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+openshift-etcd-operator                            dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+openshift-etcd-operator                            limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+openshift-etcd-operator                            rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+openshift-etcd                                     authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+openshift-etcd                                     dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+openshift-etcd                                     limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+openshift-etcd                                     rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+openshift-host-network                             authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+openshift-host-network                             dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+openshift-host-network                             limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+openshift-host-network                             rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+openshift-image-registry                           authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+openshift-image-registry                           dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+openshift-image-registry                           limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+openshift-image-registry                           rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+openshift-infra                                    authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+openshift-infra                                    dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+openshift-infra                                    limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+openshift-infra                                    rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+openshift-ingress-canary                           authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+openshift-ingress-canary                           dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+openshift-ingress-canary                           limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+openshift-ingress-canary                           rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+openshift-ingress-operator                         authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+openshift-ingress-operator                         dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+openshift-ingress-operator                         limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+openshift-ingress-operator                         rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+openshift-ingress                                  authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+openshift-ingress                                  dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+openshift-ingress                                  limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+openshift-ingress                                  rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+openshift-insights                                 authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+openshift-insights                                 dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+openshift-insights                                 limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+openshift-insights                                 rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+openshift-kni-infra                                authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+openshift-kni-infra                                dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+openshift-kni-infra                                limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+openshift-kni-infra                                rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+openshift-kube-apiserver-operator                  authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+openshift-kube-apiserver-operator                  dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+openshift-kube-apiserver-operator                  limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+openshift-kube-apiserver-operator                  rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+openshift-kube-apiserver                           authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+openshift-kube-apiserver                           dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+openshift-kube-apiserver                           limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+openshift-kube-apiserver                           rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+openshift-kube-controller-manager-operator         authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+openshift-kube-controller-manager-operator         dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+openshift-kube-controller-manager-operator         limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+openshift-kube-controller-manager-operator         rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+openshift-kube-controller-manager                  authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+openshift-kube-controller-manager                  dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+openshift-kube-controller-manager                  limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+openshift-kube-controller-manager                  rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+openshift-kube-scheduler-operator                  authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+openshift-kube-scheduler-operator                  dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+openshift-kube-scheduler-operator                  limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+openshift-kube-scheduler-operator                  rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+openshift-kube-scheduler                           authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+openshift-kube-scheduler                           dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+openshift-kube-scheduler                           limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+openshift-kube-scheduler                           rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+openshift-kube-storage-version-migrator-operator   authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+openshift-kube-storage-version-migrator-operator   dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+openshift-kube-storage-version-migrator-operator   limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+openshift-kube-storage-version-migrator-operator   rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+openshift-kube-storage-version-migrator            authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+openshift-kube-storage-version-migrator            dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+openshift-kube-storage-version-migrator            limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+openshift-kube-storage-version-migrator            rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+openshift-machine-api                              authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+openshift-machine-api                              dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+openshift-machine-api                              limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+openshift-machine-api                              rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+openshift-machine-config-operator                  authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+openshift-machine-config-operator                  dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+openshift-machine-config-operator                  limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+openshift-machine-config-operator                  rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+openshift-marketplace                              authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+openshift-marketplace                              dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+openshift-marketplace                              limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+openshift-marketplace                              rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+openshift-monitoring                               authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+openshift-monitoring                               dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+openshift-monitoring                               limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+openshift-monitoring                               rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+openshift-multus                                   authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+openshift-multus                                   dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+openshift-multus                                   limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+openshift-multus                                   rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+openshift-network-console                          authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+openshift-network-console                          dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+openshift-network-console                          limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+openshift-network-console                          rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+openshift-network-diagnostics                      authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+openshift-network-diagnostics                      dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+openshift-network-diagnostics                      limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+openshift-network-diagnostics                      rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+openshift-network-node-identity                    authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+openshift-network-node-identity                    dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+openshift-network-node-identity                    limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+openshift-network-node-identity                    rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+openshift-network-operator                         authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+openshift-network-operator                         dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+openshift-network-operator                         limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+openshift-network-operator                         rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+openshift-node                                     authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+openshift-node                                     dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+openshift-node                                     limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+openshift-node                                     rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+openshift-nutanix-infra                            authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+openshift-nutanix-infra                            dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+openshift-nutanix-infra                            limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+openshift-nutanix-infra                            rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+openshift-oauth-apiserver                          authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+openshift-oauth-apiserver                          dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+openshift-oauth-apiserver                          limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+openshift-oauth-apiserver                          rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+openshift-openstack-infra                          authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+openshift-openstack-infra                          dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+openshift-openstack-infra                          limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+openshift-openstack-infra                          rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+openshift-operator-controller                      authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+openshift-operator-controller                      dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+openshift-operator-controller                      limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+openshift-operator-controller                      rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+openshift-operator-lifecycle-manager               authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+openshift-operator-lifecycle-manager               dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+openshift-operator-lifecycle-manager               limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+openshift-operator-lifecycle-manager               rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+openshift-operators                                authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+openshift-operators                                dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+openshift-operators                                limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+openshift-operators                                rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+openshift-ovirt-infra                              authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+openshift-ovirt-infra                              dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+openshift-ovirt-infra                              limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+openshift-ovirt-infra                              rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+openshift-ovn-kubernetes                           authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+openshift-ovn-kubernetes                           dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+openshift-ovn-kubernetes                           limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+openshift-ovn-kubernetes                           rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+openshift-route-controller-manager                 authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+openshift-route-controller-manager                 dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+openshift-route-controller-manager                 limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+openshift-route-controller-manager                 rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+openshift-service-ca-operator                      authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+openshift-service-ca-operator                      dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+openshift-service-ca-operator                      limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+openshift-service-ca-operator                      rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+openshift-service-ca                               authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+openshift-service-ca                               dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+openshift-service-ca                               limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+openshift-service-ca                               rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+openshift-storage                                  authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+openshift-storage                                  dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+openshift-storage                                  limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+openshift-storage                                  rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+openshift-user-workload-monitoring                 authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+openshift-user-workload-monitoring                 dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+openshift-user-workload-monitoring                 limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+openshift-user-workload-monitoring                 rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+openshift-vsphere-infra                            authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+openshift-vsphere-infra                            dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+openshift-vsphere-infra                            limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+openshift-vsphere-infra                            rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+openshift                                          authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+openshift                                          dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+openshift                                          limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+openshift                                          rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+rocketchat                                         authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+rocketchat                                         dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+rocketchat                                         limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+rocketchat                                         rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+shared-database                                    authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+shared-database                                    dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+shared-database                                    limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+shared-database                                    rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+showroom                                           authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+showroom                                           dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+showroom                                           limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+showroom                                           rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+terminal                                           authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+terminal                                           dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+terminal                                           limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+terminal                                           rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+user1-devspaces                                    authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+user1-devspaces                                    dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+user1-devspaces                                    limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+user1-devspaces                                    rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+user2-devspaces                                    authorino-operator.v1.4.3                Authorino Operator                            1.4.3            authorino-operator.v1.4.2                Succeeded
+user2-devspaces                                    dns-operator.v1.4.2                      DNS Operator                                  1.4.2            dns-operator.v1.4.1                      Succeeded
+user2-devspaces                                    limitador-operator.v1.4.2                Limitador Operator                            1.4.2            limitador-operator.v1.4.1                Succeeded
+user2-devspaces                                    rhcl-operator.v1.4.3                     Red Hat Connectivity Link                     1.4.3            rhcl-operator.v1.4.2                     Succeeded
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ oc get subscriptions -A
+NAMESPACE               NAME                                                                         PACKAGE                           SOURCE             CHANNEL
+cert-manager-operator   openshift-cert-manager-operator                                              openshift-cert-manager-operator   redhat-operators   stable-v1
+kuadrant-system         authorino-operator-stable-redhat-operators-openshift-marketplace             authorino-operator                redhat-operators   stable
+kuadrant-system         dns-operator-stable-redhat-operators-openshift-marketplace                   dns-operator                      redhat-operators   stable
+kuadrant-system         limitador-operator-stable-redhat-operators-openshift-marketplace             limitador-operator                redhat-operators   stable
+kuadrant-system         rhcl-operator                                                                rhcl-operator                     redhat-operators   stable
+openshift-operators     amq-streams                                                                  amq-streams                       redhat-operators   amq-streams-3.x
+openshift-operators     devspaces                                                                    devspaces                         redhat-operators   stable
+openshift-operators     devworkspace-operator-fast-redhat-operators-openshift-marketplace            devworkspace-operator             redhat-operators   fast
+openshift-operators     skupper-operator                                                             skupper-operator                  redhat-operators   stable-2.1
+openshift-storage       cephcsi-operator-stable-4.19-redhat-operators-openshift-marketplace          cephcsi-operator                  redhat-operators   stable-4.19
+openshift-storage       mcg-operator-stable-4.19-redhat-operators-openshift-marketplace              mcg-operator                      redhat-operators   stable-4.19
+openshift-storage       ocs-client-operator-stable-4.19-redhat-operators-openshift-marketplace       ocs-client-operator               redhat-operators   stable-4.19
+openshift-storage       ocs-operator-stable-4.19-redhat-operators-openshift-marketplace              ocs-operator                      redhat-operators   stable-4.19
+openshift-storage       odf-csi-addons-operator-stable-4.19-redhat-operators-openshift-marketplace   odf-csi-addons-operator           redhat-operators   stable-4.19
+openshift-storage       odf-dependencies                                                             odf-dependencies                  redhat-operators   stable-4.19
+openshift-storage       odf-operator                                                                 odf-operator                      redhat-operators   stable-4.19
+openshift-storage       odf-prometheus-operator-stable-4.19-redhat-operators-openshift-marketplace   odf-prometheus-operator           redhat-operators   stable-4.19
+openshift-storage       recipe-stable-4.19-redhat-operators-openshift-marketplace                    recipe                            redhat-operators   stable-4.19
+openshift-storage       rook-ceph-operator-stable-4.19-redhat-operators-openshift-marketplace        rook-ceph-operator                redhat-operators   stable-4.19
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ oc get kuadrant -A
+NAMESPACE         NAME       MTLS AUTHORINO   MTLS LIMITADOR   AGE
+kuadrant-system   kuadrant   false            false            26h
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ oc get kuadrant -A -o yaml
+apiVersion: v1
+items:
+- apiVersion: kuadrant.io/v1beta1
+  kind: Kuadrant
+  metadata:
+    creationTimestamp: "2026-11-24T15:05:03Z"
+    finalizers:
+    - kuadrant.io/developerportal
+    generation: 2
+    name: kuadrant
+    namespace: kuadrant-system
+    resourceVersion: "74132"
+    uid: b4e06a0c-f28a-4fd3-800a-46f051694022
+  spec:
+    observability: {}
+  status:
+    conditions:
+    - lastTransitionTime: "2026-11-24T15:05:18Z"
+      message: Kuadrant is ready
+      reason: Ready
+      status: "True"
+      type: Ready
+    mtlsAuthorino: false
+    mtlsLimitador: false
+    observedGeneration: 2
+kind: List
+metadata:
+  resourceVersion: ""
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ oc api-resources | grep -Ei \
+'kuadrant|authorino|limitador|gateway.networking|mcp|istio'
+authconfigs                                                                                                                  authorino.kuadrant.io/v1beta3                 true         AuthConfig
+apikeyapprovals                                                                                                              devportal.kuadrant.io/v1alpha1                true         APIKeyApproval
+apikeyrequests                                                                                                               devportal.kuadrant.io/v1alpha1                true         APIKeyRequest
+apikeys                               apik                                                                                   devportal.kuadrant.io/v1alpha1                true         APIKey
+apiproducts                                                                                                                  devportal.kuadrant.io/v1alpha1                true         APIProduct
+wasmplugins                                                                                                                  extensions.istio.io/v1alpha1                  true         WasmPlugin
+oidcpolicies                                                                                                                 extensions.kuadrant.io/v1alpha1               true         OIDCPolicy
+planpolicies                                                                                                                 extensions.kuadrant.io/v1alpha1               true         PlanPolicy
+telemetrypolicies                                                                                                            extensions.kuadrant.io/v1alpha1               true         TelemetryPolicy
+gatewayclasses                        gc                                                                                     gateway.networking.k8s.io/v1                  false        GatewayClass
+gateways                              gtw                                                                                    gateway.networking.k8s.io/v1                  true         Gateway
+grpcroutes                                                                                                                   gateway.networking.k8s.io/v1                  true         GRPCRoute
+httproutes                                                                                                                   gateway.networking.k8s.io/v1                  true         HTTPRoute
+referencegrants                       refgrant                                                                               gateway.networking.k8s.io/v1beta1             true         ReferenceGrant
+authpolicies                                                                                                                 kuadrant.io/v1                                true         AuthPolicy
+dnshealthcheckprobes                                                                                                         kuadrant.io/v1alpha1                          true         DNSHealthCheckProbe
+dnspolicies                                                                                                                  kuadrant.io/v1                                true         DNSPolicy
+dnsrecords                                                                                                                   kuadrant.io/v1alpha1                          true         DNSRecord
+kuadrants                                                                                                                    kuadrant.io/v1beta1                           true         Kuadrant
+ratelimitpolicies                                                                                                            kuadrant.io/v1                                true         RateLimitPolicy
+tlspolicies                                                                                                                  kuadrant.io/v1                                true         TLSPolicy
+tokenratelimitpolicies                                                                                                       kuadrant.io/v1alpha1                          true         TokenRateLimitPolicy
+limitadors                                                                                                                   limitador.kuadrant.io/v1alpha1                true         Limitador
+machineconfigpools                    mcp                                                                                    machineconfiguration.openshift.io/v1          false        MachineConfigPool
+destinationrules                      dr                                                                                     networking.istio.io/v1                        true         DestinationRule
+envoyfilters                                                                                                                 networking.istio.io/v1alpha3                  true         EnvoyFilter
+gateways                              gw                                                                                     networking.istio.io/v1                        true         Gateway
+proxyconfigs                                                                                                                 networking.istio.io/v1beta1                   true         ProxyConfig
+serviceentries                        se                                                                                     networking.istio.io/v1                        true         ServiceEntry
+sidecars                                                                                                                     networking.istio.io/v1                        true         Sidecar
+virtualservices                       vs                                                                                     networking.istio.io/v1                        true         VirtualService
+workloadentries                       we                                                                                     networking.istio.io/v1                        true         WorkloadEntry
+workloadgroups                        wg                                                                                     networking.istio.io/v1                        true         WorkloadGroup
+authorinos                                                                                                                   operator.authorino.kuadrant.io/v1beta1        true         Authorino
+istiocsrs                                                                                                                    operator.openshift.io/v1alpha1                true         IstioCSR
+authorizationpolicies                 ap                                                                                     security.istio.io/v1                          true         AuthorizationPolicy
+peerauthentications                   pa                                                                                     security.istio.io/v1                          true         PeerAuthentication
+requestauthentications                ra                                                                                     security.istio.io/v1                          true         RequestAuthentication
+telemetries                           telemetry                                                                              telemetry.istio.io/v1                         true         Telemetry
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ oc get crd | grep -Ei \
+'kuadrant|authorino|limitador|gateway.networking|mcp|istio'
+apikeyapprovals.devportal.kuadrant.io                             2026-11-24T15:04:12Z
+apikeyrequests.devportal.kuadrant.io                              2026-11-24T15:04:12Z
+apikeys.devportal.kuadrant.io                                     2026-11-24T15:04:12Z
+apiproducts.devportal.kuadrant.io                                 2026-11-24T15:04:12Z
+authconfigs.authorino.kuadrant.io                                 2026-11-24T15:04:08Z
+authorinos.operator.authorino.kuadrant.io                         2026-11-24T15:04:08Z
+authorizationpolicies.security.istio.io                           2026-11-24T15:02:29Z
+authpolicies.kuadrant.io                                          2026-11-24T15:04:13Z
+destinationrules.networking.istio.io                              2026-11-24T15:02:29Z
+dnshealthcheckprobes.kuadrant.io                                  2026-11-24T15:04:10Z
+dnspolicies.kuadrant.io                                           2026-11-24T15:04:13Z
+dnsrecords.kuadrant.io                                            2026-11-24T15:04:10Z
+envoyfilters.networking.istio.io                                  2026-11-24T15:02:29Z
+gatewayclasses.gateway.networking.k8s.io                          2026-11-24T14:09:16Z
+gateways.gateway.networking.k8s.io                                2026-11-24T14:09:16Z
+gateways.networking.istio.io                                      2026-11-24T15:02:29Z
+grpcroutes.gateway.networking.k8s.io                              2026-11-24T14:09:16Z
+httproutes.gateway.networking.k8s.io                              2026-11-24T14:09:16Z
+istiocsrs.operator.openshift.io                                   2026-11-24T14:36:04Z
+kuadrants.kuadrant.io                                             2026-11-24T15:04:13Z
+limitadors.limitador.kuadrant.io                                  2026-11-24T15:04:18Z
+oidcpolicies.extensions.kuadrant.io                               2026-11-24T15:04:12Z
+peerauthentications.security.istio.io                             2026-11-24T15:02:29Z
+planpolicies.extensions.kuadrant.io                               2026-11-24T15:04:12Z
+proxyconfigs.networking.istio.io                                  2026-11-24T15:02:29Z
+ratelimitpolicies.kuadrant.io                                     2026-11-24T15:04:13Z
+referencegrants.gateway.networking.k8s.io                         2026-11-24T14:09:16Z
+requestauthentications.security.istio.io                          2026-11-24T15:02:29Z
+serviceentries.networking.istio.io                                2026-11-24T15:02:29Z
+sidecars.networking.istio.io                                      2026-11-24T15:02:29Z
+telemetries.telemetry.istio.io                                    2026-11-24T15:02:29Z
+telemetrypolicies.extensions.kuadrant.io                          2026-11-24T15:04:12Z
+tlspolicies.kuadrant.io                                           2026-11-24T15:04:13Z
+tokenratelimitpolicies.kuadrant.io                                2026-11-24T15:04:13Z
+virtualservices.networking.istio.io                               2026-11-24T15:02:29Z
+wasmplugins.extensions.istio.io                                   2026-11-24T15:02:29Z
+workloadentries.networking.istio.io                               2026-11-24T15:02:29Z
+workloadgroups.networking.istio.io                                2026-11-24T15:02:29Z
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ oc explain authpolicy.spec
+GROUP:      kuadrant.io
+KIND:       AuthPolicy
+VERSION:    v1
+
+FIELD: spec <Object>
+
+
+DESCRIPTION:
+    <empty>
+FIELDS:
+  defaults	<Object>
+    Rules to apply as defaults. Can be overridden by more specific policiy rules
+    lower in the hierarchy and by less specific policy overrides.
+    Use one of: defaults, overrides, or bare set of policy rules (implicit
+    defaults).
+
+  overrides	<Object>
+    Rules to apply as overrides. Override all policy rules lower in the
+    hierarchy. Can be overridden by less specific policy overrides.
+    Use one of: defaults, overrides, or bare set of policy rules (implicit
+    defaults).
+
+  patterns	<map[string]Object>
+    Named sets of patterns that can be referred in `when` conditions and in
+    pattern-matching authorization policy rules.
+
+  rules	<Object>
+    The auth rules of the policy.
+    See Authorino's AuthConfig CRD for more details.
+
+  targetRef	<Object> -required-
+    Reference to the object to which this policy applies.
+
+  when	<[]Object>
+    Overall conditions for the policy to be enforced.
+    If omitted, the policy will be enforced at all requests to the protected
+    routes.
+    If present, all conditions must match for the policy to be enforced.
+
+
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ oc explain ratelimitpolicy.spec
+GROUP:      kuadrant.io
+KIND:       RateLimitPolicy
+VERSION:    v1
+
+FIELD: spec <Object>
+
+
+DESCRIPTION:
+    <empty>
+FIELDS:
+  defaults	<Object>
+    Rules to apply as defaults. Can be overridden by more specific policiy rules
+    lower in the hierarchy and by less specific policy overrides.
+    Use one of: defaults, overrides, or bare set of policy rules (implicit
+    defaults).
+
+  limits	<map[string]Object>
+    Limits holds the struct of limits indexed by a unique name
+
+  overrides	<Object>
+    Rules to apply as overrides. Override all policy rules lower in the
+    hierarchy. Can be overridden by less specific policy overrides.
+    Use one of: defaults, overrides, or bare set of policy rules (implicit
+    defaults).
+
+  targetRef	<Object> -required-
+    Reference to the object to which this policy applies.
+
+  when	<[]Object>
+    Overall conditions for the policy to be enforced.
+    If omitted, the policy will be enforced at all requests to the protected
+    routes.
+    If present, all conditions must match for the policy to be enforced.
+
+
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ oc explain dnspolicy.spec
+
+GROUP:      kuadrant.io
+KIND:       DNSPolicy
+VERSION:    v1
+
+FIELD: spec <Object>
+
+
+DESCRIPTION:
+    DNSPolicySpec defines the desired state of DNSPolicy
+    
+FIELDS:
+  delegate	<boolean>
+    <no description>
+
+  excludeAddresses	<[]string>
+    ExcludeAddresses is a list of addresses (either hostnames, CIDR or
+    IPAddresses) that DNSPolicy should not use as values in the configured DNS
+    provider records. The default is to allow all addresses configured in the
+    Gateway DNSPolicy is targeting
+
+  healthCheck	<Object>
+    HealthCheckSpec configures health checks in the DNS provider.
+    By default this health check will be applied to each unique DNS A Record for
+    the listeners assigned to the target gateway
+
+  loadBalancing	<Object>
+    <no description>
+
+  providerRefs	<[]Object>
+    providerRefs is a list of references to provider secrets. Max is one but
+    intention is to allow this to be more in the future
+
+  targetRef	<Object> -required-
+    targetRef identifies an API object to apply policy to.
+
+
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 

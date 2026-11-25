@@ -1,0 +1,14 @@
+[lab-user@bastion ~]$ oc get consoleplugins
+NAME                        AGE
+kuadrant-console-plugin     26h
+monitoring-plugin           27h
+networking-console-plugin   27h
+odf-client-console          26h
+odf-console                 26h
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ oc get console.operator.openshift.io cluster \
+  -o jsonpath='{.spec.plugins}{"\n"}'
+["odf-console","monitoring-plugin","networking-console-plugin","kuadrant-console-plugin"]
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 

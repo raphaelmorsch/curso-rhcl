@@ -1,0 +1,49 @@
+raphaelmorsch@ramoreir-mac openbank-lab % oc get builds -n openbank-core
+
+oc get pods -n openbank-core
+
+oc get pods -n openbank-partners
+NAME             TYPE     FROM     STATUS     STARTED          DURATION
+openbank-api-1   Docker   Binary   Complete   10 minutes ago   1m22s
+NAME                             READY   STATUS      RESTARTS   AGE
+accounts-api-6968dbbcfd-xxdlm    1/1     Running     0          7m32s
+customers-api-5f667f4d5b-jkdg4   1/1     Running     0          7m33s
+fraud-api-549f7679d4-jkndd       1/1     Running     0          7m28s
+legacy-api-58d94cfbfb-29kln      1/1     Running     0          7m27s
+openbank-api-1-build             0/1     Completed   0          10m
+payments-api-6579979bfb-srvns    1/1     Running     0          7m30s
+unstable-api-797987fcbb-stn44    1/1     Running     0          7m25s
+NAME                            READY   STATUS    RESTARTS   AGE
+exchange-api-568f859b96-qjr66   1/1     Running   0          7m25s
+openbank-client                 1/1     Running   0          5m29s
+premium-api-5db7587cbd-b5xv9    1/1     Running   0          7m24s
+raphaelmorsch@ramoreir-mac openbank-lab % ./scripts/validate-apps.sh
+[PASS] customers health -> HTTP 200
+[PASS] customers OpenAPI -> HTTP 200
+[PASS] accounts health -> HTTP 200
+[PASS] accounts OpenAPI -> HTTP 200
+[PASS] payments health -> HTTP 200
+[PASS] payments OpenAPI -> HTTP 200
+[PASS] fraud health -> HTTP 200
+[PASS] fraud OpenAPI -> HTTP 200
+[PASS] legacy health -> HTTP 200
+[PASS] legacy OpenAPI -> HTTP 200
+[PASS] unstable health -> HTTP 200
+[PASS] unstable OpenAPI -> HTTP 200
+[PASS] exchange health -> HTTP 200
+[PASS] exchange OpenAPI -> HTTP 200
+[PASS] premium health -> HTTP 200
+[PASS] premium OpenAPI -> HTTP 200
+[PASS] Customers endpoint -> HTTP 200
+[PASS] Accounts endpoint -> HTTP 200
+[PASS] Exchange endpoint -> HTTP 200
+[PASS] Premium endpoint -> HTTP 200
+[PASS] Legacy endpoint -> HTTP 200
+[PASS] Unstable simulated error -> HTTP 500
+
+==============================
+OPENBANK VALIDATION SUMMARY
+PASS: 22
+FAIL: 0
+==============================
+raphaelmorsch@ramoreir-mac openbank-lab % 

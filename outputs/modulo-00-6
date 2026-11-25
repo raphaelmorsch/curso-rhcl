@@ -1,0 +1,190 @@
+[lab-user@bastion ~]$ oc get configs.imageregistry.operator.openshift.io \
+  cluster -o json | jq '{
+    managementState: .spec.managementState,
+    storage: .spec.storage,
+    conditions: .status.conditions
+  }'
+{
+  "managementState": "Managed",
+  "storage": {
+    "managementState": "Managed",
+    "pvc": {
+      "claim": "pvc-image-registry"
+    }
+  },
+  "conditions": [
+    {
+      "lastTransitionTime": "2026-11-24T14:17:58Z",
+      "reason": "AsExpected",
+      "status": "False",
+      "type": "ImageRegistryCertificatesControllerDegraded"
+    },
+    {
+      "lastTransitionTime": "2026-11-24T14:17:58Z",
+      "reason": "AsExpected",
+      "status": "False",
+      "type": "ImageConfigControllerDegraded"
+    },
+    {
+      "lastTransitionTime": "2026-11-24T14:18:47Z",
+      "message": "The daemon set node-ca has available replicas",
+      "reason": "AsExpected",
+      "status": "True",
+      "type": "NodeCADaemonAvailable"
+    },
+    {
+      "lastTransitionTime": "2026-11-25T12:48:37Z",
+      "message": "The daemon set node-ca is deployed",
+      "reason": "AsExpected",
+      "status": "False",
+      "type": "NodeCADaemonProgressing"
+    },
+    {
+      "lastTransitionTime": "2026-11-24T14:17:58Z",
+      "reason": "AsExpected",
+      "status": "False",
+      "type": "NodeCADaemonControllerDegraded"
+    },
+    {
+      "lastTransitionTime": "2026-11-24T14:17:58Z",
+      "reason": "AsExpected",
+      "status": "False",
+      "type": "AzureStackCloudControllerDegraded"
+    },
+    {
+      "lastTransitionTime": "2026-11-25T12:49:37Z",
+      "message": "The registry is ready",
+      "reason": "Ready",
+      "status": "False",
+      "type": "Progressing"
+    },
+    {
+      "lastTransitionTime": "2026-11-25T12:49:37Z",
+      "message": "The registry is ready",
+      "reason": "Ready",
+      "status": "True",
+      "type": "Available"
+    },
+    {
+      "lastTransitionTime": "2026-11-25T12:49:37Z",
+      "status": "False",
+      "type": "Degraded"
+    },
+    {
+      "lastTransitionTime": "2026-11-24T14:44:36Z",
+      "status": "False",
+      "type": "Removed"
+    },
+    {
+      "lastTransitionTime": "2026-11-24T14:44:34Z",
+      "reason": "PVC Exists",
+      "status": "True",
+      "type": "StorageExists"
+    }
+  ]
+}
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ oc get pods -n openshift-image-registry
+NAME                                               READY   STATUS    RESTARTS   AGE
+cluster-image-registry-operator-6d9548dd79-ftn9b   1/1     Running   2          28h
+image-registry-fcc7d4b7-6q847                      1/1     Running   0          6h1m
+node-ca-d2gmm                                      1/1     Running   1          28h
+node-ca-dlz8l                                      1/1     Running   1          28h
+node-ca-gbnxw                                      1/1     Running   1          28h
+node-ca-m2r9v                                      1/1     Running   1          28h
+node-ca-v6487                                      1/1     Running   1          28h
+node-ca-zd57j                                      1/1     Running   1          28h
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ oc get svc image-registry \
+  -n openshift-image-registry
+NAME             TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)    AGE
+image-registry   ClusterIP   172.31.136.137   <none>        5000/TCP   28h
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ oc api-resources --api-group=build.openshift.io
+NAME           SHORTNAMES   APIVERSION              NAMESPACED   KIND
+buildconfigs   bc           build.openshift.io/v1   true         BuildConfig
+builds                      build.openshift.io/v1   true         Build
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ oc api-resources --api-group=image.openshift.io
+NAME                  SHORTNAMES   APIVERSION              NAMESPACED   KIND
+images                             image.openshift.io/v1   false        Image
+imagesignatures                    image.openshift.io/v1   false        ImageSignature
+imagestreamimages     isimage      image.openshift.io/v1   true         ImageStreamImage
+imagestreamimports                 image.openshift.io/v1   true         ImageStreamImport
+imagestreammappings                image.openshift.io/v1   true         ImageStreamMapping
+imagestreams          is           image.openshift.io/v1   true         ImageStream
+imagestreamtags       istag        image.openshift.io/v1   true         ImageStreamTag
+imagetags             itag         image.openshift.io/v1   true         ImageTag
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ oc get clusteroperator image-registry
+NAME             VERSION   AVAILABLE   PROGRESSING   DEGRADED   SINCE   MESSAGE
+image-registry   4.20.46   True        False         False      6h1m    
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ oc get imagestreams -n openshift | grep -i python
+python                                               image-registry.openshift-image-registry.svc:5000/openshift/python                                               3.11-ubi8,3.11-ubi9,3.12-minimal-ubi10 + 7 more...       29 hours ago
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ oc get gatewayclass \
+  -o custom-columns='NAME:.metadata.name,CONTROLLER:.spec.controllerName'
+NAME                CONTROLLER
+openshift-default   openshift.io/gateway-controller/v1
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ oc get gateway -A
+NAMESPACE    NAME                  CLASS               ADDRESS                                                              PROGRAMMED   AGE
+ai-gateway   internal-ai-gateway   openshift-default   internal-ai-gateway-openshift-default.ai-gateway.svc.cluster.local   True         27h
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ oc api-resources --api-group=mcp.kuadrant.io
+NAME                     SHORTNAMES   APIVERSION           NAMESPACED   KIND
+mcpgatewayextensions     mcpge        mcp.kuadrant.io/v1   true         MCPGatewayExtension
+mcpserverregistrations   mcpsr        mcp.kuadrant.io/v1   true         MCPServerRegistration
+mcpvirtualservers        mcpvs        mcp.kuadrant.io/v1   true         MCPVirtualServer
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ oc get mcpgatewayextension -A
+No resources found
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ oc get mcpserverregistration -A
+No resources found
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ oc get kuadrant kuadrant \
+  -n kuadrant-system \
+  -o json | jq '.status.conditions'
+[
+  {
+    "lastTransitionTime": "2026-11-25T17:46:27Z",
+    "message": "Kuadrant is ready",
+    "reason": "Ready",
+    "status": "True",
+    "type": "Ready"
+  }
+]
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ oc get console.operator.openshift.io cluster \
+  -o jsonpath='{.spec.plugins}{"\n"}'
+["odf-console","monitoring-plugin","networking-console-plugin","kuadrant-console-plugin"]
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 

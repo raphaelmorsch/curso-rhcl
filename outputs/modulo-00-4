@@ -1,0 +1,115 @@
+[lab-user@bastion ~]$ oc api-resources --api-group=devportal.kuadrant.io
+
+NAME              SHORTNAMES   APIVERSION                       NAMESPACED   KIND
+apikeyapprovals                devportal.kuadrant.io/v1alpha1   true         APIKeyApproval
+apikeyrequests                 devportal.kuadrant.io/v1alpha1   true         APIKeyRequest
+apikeys           apik         devportal.kuadrant.io/v1alpha1   true         APIKey
+apiproducts                    devportal.kuadrant.io/v1alpha1   true         APIProduct
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ oc get apiproducts -A
+No resources found
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ oc get apikeys -A
+No resources found
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ oc get apikeyrequests -A
+No resources found
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ oc get apikeyapprovals -A
+No resources found
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ oc get planpolicies -A
+No resources found
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ oc explain apiproduct.spec --recursive
+GROUP:      devportal.kuadrant.io
+KIND:       APIProduct
+VERSION:    v1alpha1
+
+FIELD: spec <Object>
+
+
+DESCRIPTION:
+    APIProductSpec defines the desired state of APIProduct.
+    
+FIELDS:
+  approvalMode	<string> -required-
+  enum: automatic, manual
+  contact	<Object>
+    email	<string>
+    slack	<string>
+    team	<string>
+    url	<string>
+  description	<string>
+  displayName	<string> -required-
+  documentation	<Object>
+    docsURL	<string>
+    gitRepository	<string>
+    openAPISpecURL	<string>
+    swaggerUI	<string>
+    techdocsRef	<string>
+  publishStatus	<string> -required-
+  enum: Draft, Published
+  tags	<[]string>
+  targetRef	<Object> -required-
+    group	<string> -required-
+    kind	<string> -required-
+    name	<string> -required-
+  version	<string>
+
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ oc explain apikey.spec --recursive
+GROUP:      devportal.kuadrant.io
+KIND:       APIKey
+VERSION:    v1alpha1
+
+FIELD: spec <Object>
+
+
+DESCRIPTION:
+    APIKeySpec defines the desired state of APIKey.
+    
+FIELDS:
+  apiProductRef	<Object> -required-
+    name	<string> -required-
+    namespace	<string>
+  planTier	<string> -required-
+  requestedBy	<Object> -required-
+    email	<string> -required-
+    userId	<string> -required-
+  secretRef	<Object> -required-
+    name	<string>
+  useCase	<string>
+
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ oc explain apikeyapproval.spec --recursive
+GROUP:      devportal.kuadrant.io
+KIND:       APIKeyApproval
+VERSION:    v1alpha1
+
+FIELD: spec <Object>
+
+
+DESCRIPTION:
+    APIKeyApprovalSpec defines the desired state of APIKeyApproval.
+    
+FIELDS:
+  apiKeyRequestRef	<Object> -required-
+    name	<string> -required-
+  approved	<boolean> -required-
+  message	<string>
+  reason	<string>
+  reviewedAt	<string> -required-
+  reviewedBy	<string> -required-
+
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 

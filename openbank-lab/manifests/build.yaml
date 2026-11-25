@@ -1,0 +1,26 @@
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  name: openbank-api
+  namespace: openbank-core
+---
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  name: openbank-api
+  namespace: openbank-core
+spec:
+  source:
+    type: Binary
+    binary: {}
+  strategy:
+    type: Docker
+    dockerStrategy:
+      dockerfilePath: Dockerfile
+  output:
+    to:
+      kind: ImageStreamTag
+      name: openbank-api:1.0
+  triggers: []
+  successfulBuildsHistoryLimit: 2
+  failedBuildsHistoryLimit: 2

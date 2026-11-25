@@ -1,0 +1,60 @@
+[lab-user@bastion ~]$ oc get gatewayclass
+NAME                CONTROLLER                           ACCEPTED   AGE
+openshift-default   openshift.io/gateway-controller/v1   True       26h
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ oc get gatewayclass \
+  -o custom-columns='NAME:.metadata.name,CONTROLLER:.spec.controllerName'
+NAME                CONTROLLER
+openshift-default   openshift.io/gateway-controller/v1
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ oc get gateway -A
+NAMESPACE    NAME                  CLASS               ADDRESS                                                              PROGRAMMED   AGE
+ai-gateway   internal-ai-gateway   openshift-default   internal-ai-gateway-openshift-default.ai-gateway.svc.cluster.local   True         26h
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ oc get httproute -A
+NAMESPACE         NAME             HOSTNAMES   AGE
+user1-devspaces   ai-proxy-route               26h
+user2-devspaces   ai-proxy-route               26h
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ oc get grpcroute -A
+No resources found
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ oc api-resources | grep -i istio
+wasmplugins                                                                                                                  extensions.istio.io/v1alpha1                  true         WasmPlugin
+destinationrules                      dr                                                                                     networking.istio.io/v1                        true         DestinationRule
+envoyfilters                                                                                                                 networking.istio.io/v1alpha3                  true         EnvoyFilter
+gateways                              gw                                                                                     networking.istio.io/v1                        true         Gateway
+proxyconfigs                                                                                                                 networking.istio.io/v1beta1                   true         ProxyConfig
+serviceentries                        se                                                                                     networking.istio.io/v1                        true         ServiceEntry
+sidecars                                                                                                                     networking.istio.io/v1                        true         Sidecar
+virtualservices                       vs                                                                                     networking.istio.io/v1                        true         VirtualService
+workloadentries                       we                                                                                     networking.istio.io/v1                        true         WorkloadEntry
+workloadgroups                        wg                                                                                     networking.istio.io/v1                        true         WorkloadGroup
+istiocsrs                                                                                                                    operator.openshift.io/v1alpha1                true         IstioCSR
+authorizationpolicies                 ap                                                                                     security.istio.io/v1                          true         AuthorizationPolicy
+peerauthentications                   pa                                                                                     security.istio.io/v1                          true         PeerAuthentication
+requestauthentications                ra                                                                                     security.istio.io/v1                          true         RequestAuthentication
+telemetries                           telemetry                                                                              telemetry.istio.io/v1                         true         Telemetry
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ oc get pods -A | grep -Ei \
+'istiod|istio-proxy|ztunnel|waypoint'
+openshift-ingress                                  istiod-openshift-gateway-9dbdfcf6c-nd2g9                          1/1     Running     1                26h
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ oc get istio -A
+error: the server doesn't have a resource type "istio"
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 

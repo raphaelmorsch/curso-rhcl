@@ -1,0 +1,203 @@
+[lab-user@bastion ~]$ oc get csv -n kuadrant-system
+oc get deployments -n kuadrant-system
+oc get pods -n kuadrant-system
+oc get kuadrant -A
+NAME                           DISPLAY                        VERSION      REPLACES                        PHASE
+amqstreams.v3.2.2-9            Streams for Apache Kafka       3.2.2-9      amqstreams.v3.2.0-8             Succeeded
+devspacesoperator.v3.26.0      Red Hat OpenShift Dev Spaces   3.26.0       devspacesoperator.v3.25.0       Succeeded
+devworkspace-operator.v1.0.0   DevWorkspace Operator          1.0.0        devworkspace-operator.v0.43.0   Succeeded
+rhcl-operator.v1.5.0           Red Hat Connectivity Link      1.5.0        rhcl-operator.v1.4.4            Succeeded
+skupper-operator.v2.1.4-rh-3   Red Hat Service Interconnect   2.1.4-rh-3   skupper-operator.v2.1.3-rh-1    Succeeded
+NAME                                    READY   UP-TO-DATE   AVAILABLE   AGE
+authorino                               1/1     1            1           27h
+authorino-operator                      1/1     1            1           27h
+developer-portal-controller             1/1     1            1           57m
+dns-operator-controller-manager         1/1     1            1           57m
+kuadrant-console-plugin                 1/1     1            1           27h
+kuadrant-operator-controller-manager    1/1     1            1           27h
+limitador-limitador                     1/1     1            1           27h
+limitador-operator-controller-manager   1/1     1            1           27h
+mcp-gateway-controller                  1/1     1            1           57m
+NAME                                                    READY   STATUS    RESTARTS   AGE
+authorino-54d94b549d-4qwrl                              1/1     Running   0          57m
+authorino-operator-79d487d65f-jdttn                     1/1     Running   0          57m
+developer-portal-controller-58984f8f5d-7sjpl            1/1     Running   0          57m
+dns-operator-controller-manager-74c57bb5f4-627gr        1/1     Running   0          57m
+kuadrant-console-plugin-747d59d4b6-9pl8c                1/1     Running   0          57m
+kuadrant-operator-controller-manager-69f9f9b84b-wt2wx   1/1     Running   0          58m
+limitador-limitador-7fbf4695df-n9pvb                    1/1     Running   0          57m
+limitador-operator-controller-manager-698fb8686-fprxt   1/1     Running   0          57m
+mcp-gateway-controller-6cdc6c544d-zp55x                 1/1     Running   0          57m
+NAMESPACE         NAME       MTLS AUTHORINO   MTLS LIMITADOR   AGE
+kuadrant-system   kuadrant   false            false            27h
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ oc api-resources --api-group=devportal.kuadrant.io
+oc api-resources --api-group=extensions.kuadrant.io
+NAME              SHORTNAMES   APIVERSION                       NAMESPACED   KIND
+apikeyapprovals                devportal.kuadrant.io/v1alpha1   true         APIKeyApproval
+apikeyrequests                 devportal.kuadrant.io/v1alpha1   true         APIKeyRequest
+apikeys           apik         devportal.kuadrant.io/v1alpha1   true         APIKey
+apiproducts                    devportal.kuadrant.io/v1alpha1   true         APIProduct
+NAME                SHORTNAMES   APIVERSION                        NAMESPACED   KIND
+oidcpolicies                     extensions.kuadrant.io/v1alpha1   true         OIDCPolicy
+planpolicies                     extensions.kuadrant.io/v1alpha1   true         PlanPolicy
+telemetrypolicies                extensions.kuadrant.io/v1alpha1   true         TelemetryPolicy
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ oc get clusterrole | grep -E \
+'^api-(catalog-browser|consumer|owner|admin)[[:space:]]'
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ oc get clusterrole | grep -E '^api-(catalog-browser|consumer|owner|admin)[[:space:]]'
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ cat <<'EOF' > openbank-api-rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: api-catalog-browser
+rules:
+  - apiGroups: ["devportal.kuadrant.io"]
+    resources: ["apiproducts"]
+    verbs: ["get", "list", "watch"]
+
+  - apiGroups: ["extensions.kuadrant.io"]
+    resources: ["planpolicies"]
+    verbs: ["get", "list", "watch"]
+
+  - apiGroups: ["kuadrant.io"]
+    resources: ["authpolicies", "ratelimitpolicies"]
+    verbs: ["get", "list", "watch"]
+
+  - apiGroups: ["gateway.networking.k8s.io"]
+    resources: ["httproutes", "gateways"]
+    verbs: ["get", "list", "watch"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: api-consumer
+rules:
+  - apiGroups: ["devportal.kuadrant.io"]
+    resources: ["apikeys"]
+    verbs: ["get", "list", "watch", "create",
+            "update", "patch", "delete"]
+
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get", "list", "watch", "create",
+            "update", "delete"]
+
+EOF verbs: ["get", "list", "watch"]ways"]o"]licies"]pikeys"]
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ oc apply --dry-run=server -f openbank-api-rbac.yaml
+clusterrole.rbac.authorization.k8s.io/api-catalog-browser created (server dry run)
+clusterrole.rbac.authorization.k8s.io/api-consumer created (server dry run)
+clusterrole.rbac.authorization.k8s.io/api-owner created (server dry run)
+clusterrole.rbac.authorization.k8s.io/api-admin created (server dry run)
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ oc apply -f openbank-api-rbac.yaml
+clusterrole.rbac.authorization.k8s.io/api-catalog-browser created
+clusterrole.rbac.authorization.k8s.io/api-consumer created
+clusterrole.rbac.authorization.k8s.io/api-owner created
+clusterrole.rbac.authorization.k8s.io/api-admin created
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ oc get namespaces | grep openbank
+openbank-core                                      Active   76m
+openbank-gateway                                   Active   76m
+openbank-mcp                                       Active   76m
+openbank-observability                             Active   76m
+openbank-partners                                  Active   76m
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ oc create clusterrolebinding \
+  openbank-api-catalog-browser \
+  --clusterrole=api-catalog-browser \
+  --user=user1 \
+  --user=user2 \
+  --dry-run=client -o yaml | oc apply -f -
+Warning: resource clusterrolebindings/openbank-api-catalog-browser is missing the kubectl.kubernetes.io/last-applied-configuration annotation which is required by oc apply. oc apply should only be used on resources created declaratively by either oc create --save-config or oc apply. The missing annotation will be patched automatically.
+clusterrolebinding.rbac.authorization.k8s.io/openbank-api-catalog-browser configured
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ oc create rolebinding openbank-api-owner \
+  --clusterrole=api-owner \
+  --user=user1 \
+  -n openbank-core \
+  --dry-run=client -o yaml | oc apply -f -
+Warning: resource rolebindings/openbank-api-owner is missing the kubectl.kubernetes.io/last-applied-configuration annotation which is required by oc apply. oc apply should only be used on resources created declaratively by either oc create --save-config or oc apply. The missing annotation will be patched automatically.
+rolebinding.rbac.authorization.k8s.io/openbank-api-owner configured
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ oc create rolebinding openbank-api-consumer \
+  --clusterrole=api-consumer \
+  --user=user2 \
+  -n openbank-partners \
+  --dry-run=client -o yaml | oc apply -f -
+Warning: resource rolebindings/openbank-api-consumer is missing the kubectl.kubernetes.io/last-applied-configuration annotation which is required by oc apply. oc apply should only be used on resources created declaratively by either oc create --save-config or oc apply. The missing annotation will be patched automatically.
+rolebinding.rbac.authorization.k8s.io/openbank-api-consumer configured
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ cat <<'EOF' > validate-rbac.sh
+#!/bin/bash
+
+check() {
+  local expected="$1"
+  local description="$2"
+  shift 2
+
+  local result
+  result=$(oc auth can-i "$@" 2>/dev/null)
+
+  if [[ "$result" == "$expected" ]]; then
+    printf "[PASS] %s\n" "$description"
+  else
+    printf "[FAIL] %s (expected=%s, actual=%s)\n" \
+      "$description" "$expected" "$result"
+  fi
+}
+
+echo "=== OPENBANK API MANAGEMENT RBAC ==="
+
+check yes "Owner can browse API catalog" \
+  list apiproducts.devportal.kuadrant.io \
+  -A --as=user1
+
+check yes "Consumer can browse API catalog" \
+  list apiproducts.devportal.kuadrant.io \
+  -A --as=user2
+
+check yes "Owner can publish APIs" \
+  create apiproducts.devportal.kuadrant.io \
+  -n openbank-core --as=user1
+
+check yes "Owner can approve API keys" \
+  create apikeyapprovals.devportal.kuadrant.io \
+  -n openbank-core --as=user1
+
+check yes "Consumer can request API keys" \
+./validate-rbac.shrbac.shLETED ==="r secrets" \\rets" \
+=== OPENBANK API MANAGEMENT RBAC ===
+[PASS] Owner can browse API catalog
+[PASS] Consumer can browse API catalog
+[PASS] Owner can publish APIs
+[PASS] Owner can approve API keys
+[PASS] Consumer can request API keys
+[PASS] Consumer can manage own namespace secrets
+[PASS] Consumer cannot publish core APIs
+[PASS] Consumer cannot approve API keys
+[PASS] Owner cannot read consumer secrets
+[PASS] Consumer cannot read owner secrets
+=== VALIDATION COMPLETED ===
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
+[lab-user@bastion ~]$ 
