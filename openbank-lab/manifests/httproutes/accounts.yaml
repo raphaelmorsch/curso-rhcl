@@ -1,0 +1,23 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: accounts
+  namespace: openbank-core
+  labels:
+    app: accounts-api
+    app.kubernetes.io/part-of: openbank
+spec:
+  parentRefs:
+    - name: openbank-gateway
+      namespace: openbank-gateway
+      sectionName: http
+  hostnames:
+    - "api-openbank.apps.cluster-mbh58.dyn.redhatworkshops.io"
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /accounts
+      backendRefs:
+        - name: accounts-api
+          port: 8080

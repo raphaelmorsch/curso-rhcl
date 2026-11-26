@@ -1,0 +1,63 @@
+raphaelmorsch@ramoreir-mac openbank-lab % echo "=== OPENBANK GATEWAY ==="
+
+oc get gateway -n openbank-gateway
+
+echo "=== GATEWAY EXPOSURE ==="
+
+oc get route -n openbank-gateway
+
+echo "=== CORE API ROUTES ==="
+
+oc get httproute -n openbank-core
+
+echo "=== PARTNER API ROUTES ==="
+
+oc get httproute -n openbank-partners
+
+echo "=== ATTACHED ROUTES ==="
+
+oc get gateway openbank-gateway \
+  -n openbank-gateway \
+  -o json | jq '.status.listeners[] |
+  {name,attachedRoutes}'
+
+echo "=== EXTERNAL CONNECTIVITY ==="
+
+for API in customers accounts exchange premium legacy unstable
+do
+  printf "%-15s" "$API"
+
+  curl -sS -o /dev/null \
+    --max-time 10 \
+    -w 'HTTP %{http_code}\n' \
+    "https://${GATEWAY_HOST}/${API}"
+done
+=== OPENBANK GATEWAY ===
+NAME               CLASS               ADDRESS                                                                 PROGRAMMED   AGE
+openbank-gateway   openshift-default   openbank-gateway-openshift-default.openbank-gateway.svc.cluster.local   True         17h
+=== GATEWAY EXPOSURE ===
+NAME              HOST/PORT                                                PATH   SERVICES                             PORT   TERMINATION     WILDCARD
+openbank-public   api-openbank.apps.cluster-mbh58.dyn.redhatworkshops.io          openbank-gateway-openshift-default   http   edge/Redirect   None
+=== CORE API ROUTES ===
+NAME        HOSTNAMES                                                    AGE
+accounts    ["api-openbank.apps.cluster-mbh58.dyn.redhatworkshops.io"]   64m
+customers   ["api-openbank.apps.cluster-mbh58.dyn.redhatworkshops.io"]   17h
+legacy      ["api-openbank.apps.cluster-mbh58.dyn.redhatworkshops.io"]   64m
+payments    ["api-openbank.apps.cluster-mbh58.dyn.redhatworkshops.io"]   64m
+unstable    ["api-openbank.apps.cluster-mbh58.dyn.redhatworkshops.io"]   64m
+=== PARTNER API ROUTES ===
+NAME       HOSTNAMES                                                    AGE
+exchange   ["api-openbank.apps.cluster-mbh58.dyn.redhatworkshops.io"]   64m
+premium    ["api-openbank.apps.cluster-mbh58.dyn.redhatworkshops.io"]   64m
+=== ATTACHED ROUTES ===
+{
+  "name": "http",
+  "attachedRoutes": 7
+}
+=== EXTERNAL CONNECTIVITY ===
+customers      HTTP 200
+accounts       HTTP 200
+exchange       HTTP 200
+premium        HTTP 200
+legacy         HTTP 200
+unstable       HTTP 200

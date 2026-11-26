@@ -1,0 +1,265 @@
+raphaelmorsch@ramoreir-mac openbank-lab % >....                                                                                                                 
+    app.kubernetes.io/part-of: openbank
+spec:
+  parentRefs:
+    - name: ${GATEWAY_NAME}
+      namespace: ${GATEWAY_NS}
+      sectionName: http
+  hostnames:
+    - "${GATEWAY_HOST}"
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /${API}
+      backendRefs:
+        - name: ${API}-api
+          port: 8080
+YAML
+
+  oc apply -f "manifests/httproutes/${API}.yaml"
+}
+
+for API in accounts payments legacy unstable
+do
+  create_route "$API" openbank-core
+done
+
+for API in exchange premium
+do
+  create_route "$API" openbank-partners
+done
+
+echo "OpenBank HTTPRoutes deployed."
+EOF
+
+chmod +x scripts/deploy-routes.sh
+
+./scripts/deploy-routes.sh
+httproute.gateway.networking.k8s.io/accounts created
+httproute.gateway.networking.k8s.io/payments created
+httproute.gateway.networking.k8s.io/legacy created
+httproute.gateway.networking.k8s.io/unstable created
+httproute.gateway.networking.k8s.io/exchange created
+httproute.gateway.networking.k8s.io/premium created
+OpenBank HTTPRoutes deployed.
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % oc get httproute -n openbank-core
+
+oc get httproute -n openbank-partners
+NAME        HOSTNAMES                                                    AGE
+accounts    ["api-openbank.apps.cluster-mbh58.dyn.redhatworkshops.io"]   4m12s
+customers   ["api-openbank.apps.cluster-mbh58.dyn.redhatworkshops.io"]   16h
+legacy      ["api-openbank.apps.cluster-mbh58.dyn.redhatworkshops.io"]   4m9s
+payments    ["api-openbank.apps.cluster-mbh58.dyn.redhatworkshops.io"]   4m10s
+unstable    ["api-openbank.apps.cluster-mbh58.dyn.redhatworkshops.io"]   4m9s
+NAME       HOSTNAMES                                                    AGE
+exchange   ["api-openbank.apps.cluster-mbh58.dyn.redhatworkshops.io"]   4m9s
+premium    ["api-openbank.apps.cluster-mbh58.dyn.redhatworkshops.io"]   4m8s
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % oc get gateway openbank-gateway \
+  -n openbank-gateway \
+  -o json | jq '.status.listeners[] |
+  {name,attachedRoutes,conditions}'
+{
+  "name": "http",
+  "attachedRoutes": 7,
+  "conditions": [
+    {
+      "lastTransitionTime": "2026-11-25T20:29:18Z",
+      "message": "No errors found",
+      "observedGeneration": 1,
+      "reason": "Accepted",
+      "status": "True",
+      "type": "Accepted"
+    },
+    {
+      "lastTransitionTime": "2026-11-25T20:29:18Z",
+      "message": "No errors found",
+      "observedGeneration": 1,
+      "reason": "NoConflicts",
+      "status": "False",
+      "type": "Conflicted"
+    },
+    {
+      "lastTransitionTime": "2026-11-25T20:29:18Z",
+      "message": "No errors found",
+      "observedGeneration": 1,
+      "reason": "Programmed",
+      "status": "True",
+      "type": "Programmed"
+    },
+    {
+      "lastTransitionTime": "2026-11-25T20:29:18Z",
+      "message": "No errors found",
+      "observedGeneration": 1,
+      "reason": "ResolvedRefs",
+      "status": "True",
+      "type": "ResolvedRefs"
+    }
+  ]
+}
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % for API in customers accounts legacy unstable exchange premium
+do
+  printf "%-15s" "$API"
+
+  curl -sS -o /dev/null \
+    -w 'HTTP %{http_code}\n' \
+    "https://${GATEWAY_HOST}/${API}"
+done
+customers      HTTP 200
+accounts       HTTP 200
+legacy         HTTP 200
+unstable       HTTP 200
+exchange       HTTP 200
+premium        HTTP 200
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % curl -i -X POST \
+  "https://${GATEWAY_HOST}/payments" \
+  -H 'Content-Type: application/json' \
+  -H 'X-Request-ID: gateway-payment-001' \
+  -d '{
+    "account_id": "A001",
+    "amount": 100,
+    "currency": "BRL"
+  }'
+HTTP/1.1 200 OK
+date: Thu, 26 Nov 2026 13:14:12 GMT
+server: uvicorn
+content-length: 186
+content-type: application/json
+x-request-id: a23d81d3-dc0d-4eba-93eb-e10b092f9886
+x-api-version: 1.0.0
+x-backend: payments-api-6579979bfb-srvns
+set-cookie: e6da8c912891ac030d54ac847ed5df3f=6be7eb068238ad948fc94b76876bb92d; path=/; HttpOnly; Secure; SameSite=None
+
+{"payment_id":"d8844eee-bd9d-4947-be7a-975d15e963a7","status":"approved","amount":100.0,"currency":"BRL","fraud_check":{"account_id":"A001","risk_score":10,"risk":"low","approved":true}}%                                                                                                                                     raphaelmorsch@ramoreir-mac openbank-lab % curl -i -X POST \
+  "https://${GATEWAY_HOST}/payments" \
+  -H 'Content-Type: application/json' \
+  -H 'X-Request-ID: gateway-payment-001' \
+  -d '{
+    "account_id": "A001",
+    "amount": 100,
+    "currency": "BRL"
+  }' | jq
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100   258  100   186  100    72    257     99 --:--:-- --:--:-- --:--:--   356
+jq: parse error: Invalid numeric literal at line 1, column 9
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % curl -i "https://${GATEWAY_HOST}/fraud"
+HTTP/1.1 404 Not Found
+date: Thu, 26 Nov 2026 13:16:59 GMT
+content-length: 0
+set-cookie: e6da8c912891ac030d54ac847ed5df3f=6be7eb068238ad948fc94b76876bb92d; path=/; HttpOnly; Secure; SameSite=None
+
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % oc create namespace openbank-unauthorized
+namespace/openbank-unauthorized created
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % cat <<EOF | oc apply -f -
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: unauthorized-test
+  namespace: openbank-unauthorized
+spec:
+  parentRefs:
+    - name: openbank-gateway
+      namespace: openbank-gateway
+      sectionName: http
+  hostnames:
+    - "${GATEWAY_HOST}"
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /unauthorized
+      backendRefs:
+        - name: nonexistent-service
+          port: 8080
+EOF
+httproute.gateway.networking.k8s.io/unauthorized-test created
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % oc get httproute unauthorized-test \
+  -n openbank-unauthorized \
+  -o json | jq '.status.parents'
+[
+  {
+    "conditions": [
+      {
+        "lastTransitionTime": "2026-11-26T13:20:55Z",
+        "message": "hostnames matched parent hostname \"api-openbank.apps.cluster-mbh58.dyn.redhatworkshops.io\", but namespace \"openbank-unauthorized\" is not allowed by the parent",
+        "observedGeneration": 1,
+        "reason": "NotAllowedByListeners",
+        "status": "False",
+        "type": "Accepted"
+      },
+      {
+        "lastTransitionTime": "2026-11-26T13:20:55Z",
+        "message": "backend(nonexistent-service.openbank-unauthorized.svc.cluster.local) not found",
+        "observedGeneration": 1,
+        "reason": "BackendNotFound",
+        "status": "False",
+        "type": "ResolvedRefs"
+      }
+    ],
+    "controllerName": "openshift.io/gateway-controller/v1",
+    "parentRef": {
+      "group": "gateway.networking.k8s.io",
+      "kind": "Gateway",
+      "name": "openbank-gateway",
+      "namespace": "openbank-gateway",
+      "sectionName": "http"
+    }
+  }
+]
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % oc label namespace openbank-unauthorized \
+  openbank.io/gateway-access=enabled
+namespace/openbank-unauthorized labeled
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % oc delete namespace openbank-unauthorized
+namespace "openbank-unauthorized" deleted
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % oc auth can-i create httproutes --as=user1 -n openbank-core
+no
+raphaelmorsch@ramoreir-mac openbank-lab % oc auth can-i update gateways --as=user1 -n openbank-core
+no
+raphaelmorsch@ramoreir-mac openbank-lab % oc auth can-i create apiproducts --as=user1 -n openbank-core
+yes
+raphaelmorsch@ramoreir-mac openbank-lab % oc apply -f manifests/roles/openbank-route-developer.yaml 
+role.rbac.authorization.k8s.io/openbank-route-developer created
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % oc create rolebinding openbank-route-developer \
+> --role=openbank-route-developer \
+> --user=user1 \
+> -n openbank-core
+rolebinding.rbac.authorization.k8s.io/openbank-route-developer created
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % oc auth can-i create httproutes --as=user1
+no
+raphaelmorsch@ramoreir-mac openbank-lab % oc auth can-i create httproutes -n openbank-core --as=user1
+yes
+raphaelmorsch@ramoreir-mac openbank-lab % oc auth can-i update gateways -n openbank-gateway --as=user1
+no
+raphaelmorsch@ramoreir-mac openbank-lab % oc auth can-i create httproutes -n openbank-partners --as=user1
+no
+raphaelmorsch@ramoreir-mac openbank-lab %    

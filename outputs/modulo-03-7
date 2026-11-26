@@ -1,0 +1,101 @@
+raphaelmorsch@ramoreir-mac openbank-lab % oc get deployment openbank-gateway-openshift-default \
+  -n openbank-gateway \
+  -o json | jq '{
+    replicas: .spec.replicas,
+    readyReplicas: .status.readyReplicas,
+    strategy: .spec.strategy,
+    ownerReferences: .metadata.ownerReferences
+  }'
+{
+  "replicas": 1,
+  "readyReplicas": 1,
+  "strategy": {
+    "rollingUpdate": {
+      "maxSurge": "25%",
+      "maxUnavailable": "25%"
+    },
+    "type": "RollingUpdate"
+  },
+  "ownerReferences": [
+    {
+      "apiVersion": "gateway.networking.k8s.io/v1beta1",
+      "kind": "Gateway",
+      "name": "openbank-gateway",
+      "uid": "7e59ad90-2134-4019-a0ec-2a7f9530b36a"
+    }
+  ]
+}
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % oc get gatewayclass openshift-default -o yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: GatewayClass
+metadata:
+  creationTimestamp: "2026-11-24T15:02:28Z"
+  finalizers:
+  - openshift.io/ingress-operator-sail-finalizer
+  generation: 1
+  name: openshift-default
+  resourceVersion: "285317"
+  uid: fcd62bb2-fe5f-4264-9231-a525146b2605
+spec:
+  controllerName: openshift.io/gateway-controller/v1
+status:
+  conditions:
+  - lastTransitionTime: "2026-11-24T15:02:40Z"
+    message: Handled by Istio controller
+    observedGeneration: 1
+    reason: Accepted
+    status: "True"
+    type: Accepted
+  - lastTransitionTime: "2026-11-25T12:42:52Z"
+    message: istiod v1.26.8 installed
+    observedGeneration: 1
+    reason: Installed
+    status: "True"
+    type: ControllerInstalled
+  - lastTransitionTime: "2026-11-25T12:42:52Z"
+    message: CRDs updated by CIO
+    observedGeneration: 1
+    reason: ManagedByCIO
+    status: "True"
+    type: CRDsReady
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % oc explain gateway.spec.infrastructure --recursive
+GROUP:      gateway.networking.k8s.io
+KIND:       Gateway
+VERSION:    v1
+
+FIELD: infrastructure <Object>
+
+
+DESCRIPTION:
+    Infrastructure defines infrastructure level attributes about this Gateway
+    instance.
+    
+    Support: Extended
+    
+FIELDS:
+  annotations	<map[string]string>
+  labels	<map[string]string>
+  parametersRef	<Object>
+    group	<string> -required-
+    kind	<string> -required-
+    name	<string> -required-
+
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % oc api-resources | grep -Ei \
+'gateway|horizontalpodautoscaler|poddisruptionbudget'
+horizontalpodautoscalers              hpa                                                                                    autoscaling/v2                                true         HorizontalPodAutoscaler
+gateway-passthrough                                                                                                          bifrost.demo.redhat.com/v1alpha1              false        ChallengePayload
+gatewayclasses                        gc                                                                                     gateway.networking.k8s.io/v1                  false        GatewayClass
+gateways                              gtw                                                                                    gateway.networking.k8s.io/v1                  true         Gateway
+grpcroutes                                                                                                                   gateway.networking.k8s.io/v1                  true         GRPCRoute
+httproutes                                                                                                                   gateway.networking.k8s.io/v1                  true         HTTPRoute
+referencegrants                       refgrant                                                                               gateway.networking.k8s.io/v1beta1             true         ReferenceGrant
+mcpgatewayextensions                  mcpge                                                                                  mcp.kuadrant.io/v1                            true         MCPGatewayExtension
+gateways                              gw                                                                                     networking.istio.io/v1                        true         Gateway
+poddisruptionbudgets                  pdb                                                                                    policy/v1                                     true         PodDisruptionBudget
+raphaelmorsch@ramoreir-mac openbank-lab % 
