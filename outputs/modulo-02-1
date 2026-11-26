@@ -1,0 +1,215 @@
+raphaelmorsch@ramoreir-mac openbank-lab % oc get deployments -n kuadrant-system
+NAME                                    READY   UP-TO-DATE   AVAILABLE   AGE
+authorino                               1/1     1            1           29h
+authorino-operator                      1/1     1            1           29h
+developer-portal-controller             1/1     1            1           148m
+dns-operator-controller-manager         1/1     1            1           148m
+kuadrant-console-plugin                 1/1     1            1           29h
+kuadrant-operator-controller-manager    1/1     1            1           29h
+limitador-limitador                     1/1     1            1           29h
+limitador-operator-controller-manager   1/1     1            1           29h
+mcp-gateway-controller                  1/1     1            1           148m
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % oc get deployments -n kuadrant-system -o json | jq -r '
+  .items[] |
+  .metadata.name as $deployment |
+  .spec.template.spec.containers[] |
+  [$deployment, .name, .image] |
+  @tsv
+' | column -t
+authorino                              authorino                registry.redhat.io/rhcl-1/authorino-rhel9@sha256:fb72464b7c88f036afad7667ccdbe7a465919a5722f492e7da3598399ac13c16
+authorino-operator                     manager                  registry.redhat.io/rhcl-1/authorino-rhel9-operator@sha256:dd4629ca035b962fce6871fcab1e5e54bc24312a952fe0454a657c18b9b29402
+developer-portal-controller            manager                  registry.redhat.io/rhcl-1/developer-portal-controller-rhel9@sha256:66b1656100087f5949d910e839422f75c3030bcbdffb6b79812d0518c54f8f90
+dns-operator-controller-manager        manager                  registry.redhat.io/rhcl-1/dns-rhel9-operator@sha256:5c642fccff0a02ad72a6354fe44695e87cca8903a8713c412e995cfe6f9ca388
+kuadrant-console-plugin                kuadrant-console-plugin  registry.redhat.io/rhcl-1/rhcl-console-plugin-rhel9@sha256:b1bdbb53a5ea278cfae4801a85c3711a1ac6b3ae24a8b08c76ec41ed5f8c8e9a
+kuadrant-operator-controller-manager   manager                  registry.redhat.io/rhcl-1/rhcl-rhel9-operator@sha256:d297423e5507ec7ef5be128004902e3f62b5bf1d97f034d465c12628820ca299
+limitador-limitador                    limitador                registry.redhat.io/rhcl-1/limitador-rhel9@sha256:5ce716d90f7e944720a5d1a6c133d13b1caf6c4f43850778a0d14ea1e395c8aa
+limitador-operator-controller-manager  manager                  registry.redhat.io/rhcl-1/limitador-rhel9-operator@sha256:d81c7c651171a924b50b8df3cf7934a0d98de9057bdf92a50f5acfaf4f4283f3
+mcp-gateway-controller                 mcp-controller           registry.redhat.io/rhcl-1/mcp-gateway-rhel9-operator@sha256:ac8b4d4c78cf24a7a5ee12de4cdc89b7f24bbb6c02e36798e74d81e5b3e9aefa
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % oc get kuadrant -n kuadrant-system -o yaml
+apiVersion: v1
+items:
+- apiVersion: kuadrant.io/v1beta1
+  kind: Kuadrant
+  metadata:
+    creationTimestamp: "2026-11-24T15:05:03Z"
+    generation: 2
+    name: kuadrant
+    namespace: kuadrant-system
+    resourceVersion: "548087"
+    uid: b4e06a0c-f28a-4fd3-800a-46f051694022
+  spec:
+    observability: {}
+  status:
+    conditions:
+    - lastTransitionTime: "2026-11-25T17:46:27Z"
+      message: Kuadrant is ready
+      reason: Ready
+      status: "True"
+      type: Ready
+    mtlsAuthorino: false
+    mtlsLimitador: false
+    observedGeneration: 2
+kind: List
+metadata:
+  resourceVersion: ""
+raphaelmorsch@ramoreir-mac openbank-lab % oc logs \
+  deployment/kuadrant-operator-controller-manager \
+  -n kuadrant-system \
+  --tail=50
+{"level":"info","ts":"2026-11-25T18:05:40.242Z","logger":"kuadrant-operator.NetworkPolicyReconciler.operators","msg":"reconciling networkPolicy resources for operators","status":"completed"}
+{"level":"info","ts":"2026-11-25T18:05:40.242Z","logger":"kuadrant-operator.LimitadorIstioIntegrationReconciler","msg":"get object","kind":"v1.Deployment","name":"limitador-limitador","namespace":"kuadrant-system"}
+{"level":"info","ts":"2026-11-25T18:05:40.242Z","logger":"kuadrant-operator.LimitadorResourceReconciler","msg":"reconciling limitador resource","status":"started"}
+{"level":"info","ts":"2026-11-25T18:05:40.242Z","logger":"kuadrant-operator.LimitadorResourceReconciler","msg":"applying limitador resource"}
+{"level":"info","ts":"2026-11-25T18:05:40.248Z","logger":"kuadrant-operator.AuthorinoReconciler","msg":"authorino resource applied successfully"}
+{"level":"info","ts":"2026-11-25T18:05:40.248Z","logger":"kuadrant-operator.LimitadorResourceReconciler","msg":"limitador resource applied successfully"}
+{"level":"info","ts":"2026-11-25T18:05:40.248Z","logger":"kuadrant-operator.LimitadorResourceReconciler","msg":"reconciling limitador resource","status":"completed"}
+{"level":"info","ts":"2026-11-25T18:05:40.273Z","logger":"kuadrant-operator.KuadrantStatusUpdater","msg":"reconciling kuadrant status","status":"started"}
+{"level":"info","ts":"2026-11-25T18:05:40.273Z","logger":"kuadrant-operator.KuadrantStatusUpdater","msg":"reconciling kuadrant status","status":"completed"}
+{"level":"info","ts":"2026-11-25T18:06:19.992Z","logger":"kuadrant-operator.controlplane.reconciler","msg":"reconciling KuadrantControlPlane","name":"default"}
+{"level":"info","ts":"2026-11-25T18:09:04.432Z","logger":"kuadrant-operator.event logger","msg":"new events","resources":["ClusterVersion","ConfigMap"],"eventTypes":{"update":2}}
+{"level":"info","ts":"2026-11-25T18:11:21.189Z","logger":"kuadrant-operator.controlplane.reconciler","msg":"reconciling KuadrantControlPlane","name":"default"}
+{"level":"info","ts":"2026-11-25T18:12:28.509Z","logger":"kuadrant-operator.event logger","msg":"new events","resources":["ConfigMap","ClusterVersion"],"eventTypes":{"update":2}}
+{"level":"info","ts":"2026-11-25T18:15:52.772Z","logger":"kuadrant-operator.event logger","msg":"new events","resources":["ClusterVersion","ConfigMap"],"eventTypes":{"update":2}}
+{"level":"info","ts":"2026-11-25T18:16:22.174Z","logger":"kuadrant-operator.controlplane.reconciler","msg":"reconciling KuadrantControlPlane","name":"default"}
+{"level":"info","ts":"2026-11-25T18:21:23.380Z","logger":"kuadrant-operator.controlplane.reconciler","msg":"reconciling KuadrantControlPlane","name":"default"}
+{"level":"info","ts":"2026-11-25T18:26:24.528Z","logger":"kuadrant-operator.controlplane.reconciler","msg":"reconciling KuadrantControlPlane","name":"default"}
+{"level":"info","ts":"2026-11-25T18:31:25.832Z","logger":"kuadrant-operator.controlplane.reconciler","msg":"reconciling KuadrantControlPlane","name":"default"}
+{"level":"info","ts":"2026-11-25T18:36:26.813Z","logger":"kuadrant-operator.controlplane.reconciler","msg":"reconciling KuadrantControlPlane","name":"default"}
+{"level":"info","ts":"2026-11-25T18:39:41.465Z","logger":"kuadrant-operator.event logger","msg":"new events","resources":["ClusterVersion","ConfigMap"],"eventTypes":{"update":2}}
+{"level":"info","ts":"2026-11-25T18:41:27.920Z","logger":"kuadrant-operator.controlplane.reconciler","msg":"reconciling KuadrantControlPlane","name":"default"}
+{"level":"info","ts":"2026-11-25T18:43:05.525Z","logger":"kuadrant-operator.event logger","msg":"new events","resources":["ClusterVersion","ConfigMap"],"eventTypes":{"update":2}}
+{"level":"info","ts":"2026-11-25T18:46:29.157Z","logger":"kuadrant-operator.controlplane.reconciler","msg":"reconciling KuadrantControlPlane","name":"default"}
+{"level":"info","ts":"2026-11-25T18:51:30.037Z","logger":"kuadrant-operator.controlplane.reconciler","msg":"reconciling KuadrantControlPlane","name":"default"}
+{"level":"info","ts":"2026-11-25T18:56:31.016Z","logger":"kuadrant-operator.controlplane.reconciler","msg":"reconciling KuadrantControlPlane","name":"default"}
+{"level":"info","ts":"2026-11-25T19:01:31.934Z","logger":"kuadrant-operator.controlplane.reconciler","msg":"reconciling KuadrantControlPlane","name":"default"}
+{"level":"info","ts":"2026-11-25T19:03:30.223Z","logger":"kuadrant-operator.event logger","msg":"new events","resources":["ClusterVersion","ConfigMap"],"eventTypes":{"update":2}}
+{"level":"info","ts":"2026-11-25T19:06:32.999Z","logger":"kuadrant-operator.controlplane.reconciler","msg":"reconciling KuadrantControlPlane","name":"default"}
+{"level":"info","ts":"2026-11-25T19:06:54.363Z","logger":"kuadrant-operator.event logger","msg":"new events","resources":["ClusterVersion","ConfigMap"],"eventTypes":{"update":2}}
+{"level":"info","ts":"2026-11-25T19:11:34.277Z","logger":"kuadrant-operator.controlplane.reconciler","msg":"reconciling KuadrantControlPlane","name":"default"}
+{"level":"info","ts":"2026-11-25T19:16:35.314Z","logger":"kuadrant-operator.controlplane.reconciler","msg":"reconciling KuadrantControlPlane","name":"default"}
+{"level":"info","ts":"2026-11-25T19:21:36.406Z","logger":"kuadrant-operator.controlplane.reconciler","msg":"reconciling KuadrantControlPlane","name":"default"}
+{"level":"info","ts":"2026-11-25T19:23:54.998Z","logger":"kuadrant-operator.event logger","msg":"new events","resources":["ConfigMap","ClusterVersion"],"eventTypes":{"update":2}}
+{"level":"info","ts":"2026-11-25T19:26:37.405Z","logger":"kuadrant-operator.controlplane.reconciler","msg":"reconciling KuadrantControlPlane","name":"default"}
+{"level":"info","ts":"2026-11-25T19:27:19.056Z","logger":"kuadrant-operator.event logger","msg":"new events","resources":["ClusterVersion","ConfigMap"],"eventTypes":{"update":2}}
+{"level":"info","ts":"2026-11-25T19:31:38.583Z","logger":"kuadrant-operator.controlplane.reconciler","msg":"reconciling KuadrantControlPlane","name":"default"}
+{"level":"info","ts":"2026-11-25T19:36:39.638Z","logger":"kuadrant-operator.controlplane.reconciler","msg":"reconciling KuadrantControlPlane","name":"default"}
+{"level":"info","ts":"2026-11-25T19:41:40.785Z","logger":"kuadrant-operator.controlplane.reconciler","msg":"reconciling KuadrantControlPlane","name":"default"}
+{"level":"info","ts":"2026-11-25T19:44:19.596Z","logger":"kuadrant-operator.event logger","msg":"new events","resources":["ClusterVersion","ConfigMap"],"eventTypes":{"update":2}}
+{"level":"info","ts":"2026-11-25T19:46:41.817Z","logger":"kuadrant-operator.controlplane.reconciler","msg":"reconciling KuadrantControlPlane","name":"default"}
+{"level":"info","ts":"2026-11-25T19:47:43.706Z","logger":"kuadrant-operator.event logger","msg":"new events","resources":["ConfigMap","ClusterVersion"],"eventTypes":{"update":2}}
+{"level":"info","ts":"2026-11-25T19:51:42.857Z","logger":"kuadrant-operator.controlplane.reconciler","msg":"reconciling KuadrantControlPlane","name":"default"}
+{"level":"info","ts":"2026-11-25T19:56:44.093Z","logger":"kuadrant-operator.controlplane.reconciler","msg":"reconciling KuadrantControlPlane","name":"default"}
+{"level":"info","ts":"2026-11-25T19:57:56.120Z","logger":"kuadrant-operator.event logger","msg":"new events","resources":["ConfigMap","ClusterVersion"],"eventTypes":{"update":2}}
+{"level":"info","ts":"2026-11-25T20:01:20.352Z","logger":"kuadrant-operator.event logger","msg":"new events","resources":["ClusterVersion","ConfigMap"],"eventTypes":{"update":2}}
+{"level":"info","ts":"2026-11-25T20:01:45.221Z","logger":"kuadrant-operator.controlplane.reconciler","msg":"reconciling KuadrantControlPlane","name":"default"}
+{"level":"info","ts":"2026-11-25T20:06:46.271Z","logger":"kuadrant-operator.controlplane.reconciler","msg":"reconciling KuadrantControlPlane","name":"default"}
+{"level":"info","ts":"2026-11-25T20:08:08.446Z","logger":"kuadrant-operator.event logger","msg":"new events","resources":["ConfigMap","ClusterVersion"],"eventTypes":{"update":2}}
+{"level":"info","ts":"2026-11-25T20:11:32.656Z","logger":"kuadrant-operator.event logger","msg":"new events","resources":["ClusterVersion","ConfigMap"],"eventTypes":{"update":2}}
+{"level":"info","ts":"2026-11-25T20:11:47.344Z","logger":"kuadrant-operator.controlplane.reconciler","msg":"reconciling KuadrantControlPlane","name":"default"}
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % oc logs \
+  deployment/developer-portal-controller \
+  -n kuadrant-system \
+  --tail=50
+2026-11-25T19:57:46Z	DEBUG	reconciling apikey status	{"controller": "apikey-status", "namespace": "", "name": "apikey-status", "reconcileID": "289ccb43-89e1-4d65-956b-d279d2f8fa74"}
+2026-11-25T19:57:46Z	DEBUG	reconciling apikey status: done	{"controller": "apikey-status", "namespace": "", "name": "apikey-status", "reconcileID": "289ccb43-89e1-4d65-956b-d279d2f8fa74"}
+2026-11-25T19:57:46Z	DEBUG	reconciling apikey status	{"controller": "apikey-status", "namespace": "", "name": "apikey-status", "reconcileID": "325ebef6-37ec-4a6c-93d1-7d1f2bde251e"}
+2026-11-25T19:57:46Z	DEBUG	reconciling apikey status: done	{"controller": "apikey-status", "namespace": "", "name": "apikey-status", "reconcileID": "325ebef6-37ec-4a6c-93d1-7d1f2bde251e"}
+2026-11-25T19:57:46Z	DEBUG	reconciling apikey status	{"controller": "apikey-status", "namespace": "", "name": "apikey-status", "reconcileID": "437b5c39-48d8-43f9-b130-142ff163be99"}
+2026-11-25T19:57:46Z	DEBUG	reconciling apikey status: done	{"controller": "apikey-status", "namespace": "", "name": "apikey-status", "reconcileID": "437b5c39-48d8-43f9-b130-142ff163be99"}
+2026-11-25T19:57:46Z	DEBUG	reconciling apikey status	{"controller": "apikey-status", "namespace": "", "name": "apikey-status", "reconcileID": "b724447c-f0c0-41c5-8c97-831d7df68b09"}
+2026-11-25T19:57:46Z	DEBUG	reconciling apikey status: done	{"controller": "apikey-status", "namespace": "", "name": "apikey-status", "reconcileID": "b724447c-f0c0-41c5-8c97-831d7df68b09"}
+2026-11-25T19:57:46Z	DEBUG	reconciling apikey status	{"controller": "apikey-status", "namespace": "", "name": "apikey-status", "reconcileID": "ae5dbd83-7223-4f89-bfbd-dd903b433954"}
+2026-11-25T19:57:46Z	DEBUG	reconciling apikey status: done	{"controller": "apikey-status", "namespace": "", "name": "apikey-status", "reconcileID": "ae5dbd83-7223-4f89-bfbd-dd903b433954"}
+2026-11-25T19:57:46Z	DEBUG	reconciling apikey status	{"controller": "apikey-status", "namespace": "", "name": "apikey-status", "reconcileID": "5bef589c-dbff-4877-ba5e-5f6a48092c8a"}
+2026-11-25T19:57:46Z	DEBUG	reconciling apikey status: done	{"controller": "apikey-status", "namespace": "", "name": "apikey-status", "reconcileID": "5bef589c-dbff-4877-ba5e-5f6a48092c8a"}
+2026-11-25T19:57:46Z	DEBUG	reconciling apikey status	{"controller": "apikey-status", "namespace": "", "name": "apikey-status", "reconcileID": "db8eae8d-9c4f-4bcf-822e-a14fc4cd14db"}
+2026-11-25T19:57:46Z	DEBUG	reconciling apikey status: done	{"controller": "apikey-status", "namespace": "", "name": "apikey-status", "reconcileID": "db8eae8d-9c4f-4bcf-822e-a14fc4cd14db"}
+2026-11-25T19:57:46Z	DEBUG	reconciling apikey status	{"controller": "apikey-status", "namespace": "", "name": "apikey-status", "reconcileID": "7a84b090-423f-4959-a667-f149e89c6784"}
+2026-11-25T19:57:46Z	DEBUG	reconciling apikey status: done	{"controller": "apikey-status", "namespace": "", "name": "apikey-status", "reconcileID": "7a84b090-423f-4959-a667-f149e89c6784"}
+2026-11-25T19:57:46Z	DEBUG	reconciling apikey status	{"controller": "apikey-status", "namespace": "", "name": "apikey-status", "reconcileID": "bef045c0-4607-4044-ac9c-16c019d93660"}
+2026-11-25T19:57:46Z	DEBUG	reconciling apikey status: done	{"controller": "apikey-status", "namespace": "", "name": "apikey-status", "reconcileID": "bef045c0-4607-4044-ac9c-16c019d93660"}
+2026-11-25T19:57:46Z	DEBUG	reconciling apikey status	{"controller": "apikey-status", "namespace": "", "name": "apikey-status", "reconcileID": "cb3716ae-a4a0-4aae-bf34-d69c704a8821"}
+2026-11-25T19:57:46Z	DEBUG	reconciling apikey status: done	{"controller": "apikey-status", "namespace": "", "name": "apikey-status", "reconcileID": "cb3716ae-a4a0-4aae-bf34-d69c704a8821"}
+2026-11-25T20:02:38Z	DEBUG	reconciling apikey status	{"controller": "apikey-status", "namespace": "", "name": "apikey-status", "reconcileID": "1cd5f220-45ef-4408-8c3b-811ff631aa5a"}
+2026-11-25T20:02:38Z	DEBUG	reconciling apikey status: done	{"controller": "apikey-status", "namespace": "", "name": "apikey-status", "reconcileID": "1cd5f220-45ef-4408-8c3b-811ff631aa5a"}
+2026-11-25T20:02:49Z	DEBUG	reconciling apikey status	{"controller": "apikey-status", "namespace": "", "name": "apikey-status", "reconcileID": "49b0ff35-e4a2-4a52-bf15-163e3d151818"}
+2026-11-25T20:02:49Z	DEBUG	reconciling apikey status: done	{"controller": "apikey-status", "namespace": "", "name": "apikey-status", "reconcileID": "49b0ff35-e4a2-4a52-bf15-163e3d151818"}
+2026-11-25T20:09:42Z	DEBUG	reconciling apikey status	{"controller": "apikey-status", "namespace": "", "name": "apikey-status", "reconcileID": "1c798e00-eaef-4cd7-b8eb-93cef0ea2eab"}
+2026-11-25T20:09:42Z	DEBUG	reconciling apikey status: done	{"controller": "apikey-status", "namespace": "", "name": "apikey-status", "reconcileID": "1c798e00-eaef-4cd7-b8eb-93cef0ea2eab"}
+2026-11-25T20:09:42Z	DEBUG	reconciling apikey status	{"controller": "apikey-status", "namespace": "", "name": "apikey-status", "reconcileID": "0db4bef0-79ea-4c42-bdac-86e1b0f12cc3"}
+2026-11-25T20:09:42Z	DEBUG	reconciling apikey status: done	{"controller": "apikey-status", "namespace": "", "name": "apikey-status", "reconcileID": "0db4bef0-79ea-4c42-bdac-86e1b0f12cc3"}
+2026-11-25T20:09:43Z	DEBUG	reconciling apikey status	{"controller": "apikey-status", "namespace": "", "name": "apikey-status", "reconcileID": "406a5779-8413-456a-b4dd-f64671dc0421"}
+2026-11-25T20:09:43Z	DEBUG	reconciling apikey status: done	{"controller": "apikey-status", "namespace": "", "name": "apikey-status", "reconcileID": "406a5779-8413-456a-b4dd-f64671dc0421"}
+2026-11-25T20:09:43Z	DEBUG	reconciling apikey status	{"controller": "apikey-status", "namespace": "", "name": "apikey-status", "reconcileID": "5d76d2e9-1bca-40cb-b256-586bf038b39d"}
+2026-11-25T20:09:43Z	DEBUG	reconciling apikey status: done	{"controller": "apikey-status", "namespace": "", "name": "apikey-status", "reconcileID": "5d76d2e9-1bca-40cb-b256-586bf038b39d"}
+2026-11-25T20:09:44Z	DEBUG	reconciling apikey status	{"controller": "apikey-status", "namespace": "", "name": "apikey-status", "reconcileID": "0082727a-7a58-47c4-9bee-cb9aa26d10a5"}
+2026-11-25T20:09:44Z	DEBUG	reconciling apikey status: done	{"controller": "apikey-status", "namespace": "", "name": "apikey-status", "reconcileID": "0082727a-7a58-47c4-9bee-cb9aa26d10a5"}
+2026-11-25T20:12:49Z	DEBUG	reconciling apikey status	{"controller": "apikey-status", "namespace": "", "name": "apikey-status", "reconcileID": "99c60411-db63-473b-8823-5686d6714d90"}
+2026-11-25T20:12:49Z	DEBUG	reconciling apikey status: done	{"controller": "apikey-status", "namespace": "", "name": "apikey-status", "reconcileID": "99c60411-db63-473b-8823-5686d6714d90"}
+2026-11-25T20:12:49Z	DEBUG	reconciling apikey status	{"controller": "apikey-status", "namespace": "", "name": "apikey-status", "reconcileID": "5ca0f8e9-b759-4799-b6b1-f8db721fd00b"}
+2026-11-25T20:12:49Z	DEBUG	reconciling apikey status: done	{"controller": "apikey-status", "namespace": "", "name": "apikey-status", "reconcileID": "5ca0f8e9-b759-4799-b6b1-f8db721fd00b"}
+2026-11-25T20:12:49Z	DEBUG	reconciling apikey status	{"controller": "apikey-status", "namespace": "", "name": "apikey-status", "reconcileID": "eb331886-9237-4fa3-89d7-9ac95aead3b0"}
+2026-11-25T20:12:49Z	DEBUG	reconciling apikey status: done	{"controller": "apikey-status", "namespace": "", "name": "apikey-status", "reconcileID": "eb331886-9237-4fa3-89d7-9ac95aead3b0"}
+2026-11-25T20:12:49Z	DEBUG	reconciling apikey status	{"controller": "apikey-status", "namespace": "", "name": "apikey-status", "reconcileID": "d18b81d5-ca14-460f-967f-d88226188a2d"}
+2026-11-25T20:12:49Z	DEBUG	reconciling apikey status: done	{"controller": "apikey-status", "namespace": "", "name": "apikey-status", "reconcileID": "d18b81d5-ca14-460f-967f-d88226188a2d"}
+2026-11-25T20:12:51Z	DEBUG	reconciling apikey status	{"controller": "apikey-status", "namespace": "", "name": "apikey-status", "reconcileID": "a94e14fe-4a3b-41e7-92db-3dd0b04da9e5"}
+2026-11-25T20:12:51Z	DEBUG	reconciling apikey status: done	{"controller": "apikey-status", "namespace": "", "name": "apikey-status", "reconcileID": "a94e14fe-4a3b-41e7-92db-3dd0b04da9e5"}
+2026-11-25T20:12:51Z	DEBUG	reconciling apikey status	{"controller": "apikey-status", "namespace": "", "name": "apikey-status", "reconcileID": "2ab34ee3-08ef-44a7-b83f-f632c7f3776e"}
+2026-11-25T20:12:51Z	DEBUG	reconciling apikey status: done	{"controller": "apikey-status", "namespace": "", "name": "apikey-status", "reconcileID": "2ab34ee3-08ef-44a7-b83f-f632c7f3776e"}
+2026-11-25T20:12:51Z	DEBUG	reconciling apikey status	{"controller": "apikey-status", "namespace": "", "name": "apikey-status", "reconcileID": "d2d91a24-e79a-4443-a4ac-564fd5de2f6f"}
+2026-11-25T20:12:51Z	DEBUG	reconciling apikey status: done	{"controller": "apikey-status", "namespace": "", "name": "apikey-status", "reconcileID": "d2d91a24-e79a-4443-a4ac-564fd5de2f6f"}
+2026-11-25T20:12:51Z	DEBUG	reconciling apikey status	{"controller": "apikey-status", "namespace": "", "name": "apikey-status", "reconcileID": "93dfad61-9db5-4a0d-b815-6ae84a32a84b"}
+2026-11-25T20:12:51Z	DEBUG	reconciling apikey status: done	{"controller": "apikey-status", "namespace": "", "name": "apikey-status", "reconcileID": "93dfad61-9db5-4a0d-b815-6ae84a32a84b"}
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % oc api-resources --api-group=kuadrant.io
+
+oc api-resources --api-group=devportal.kuadrant.io
+
+oc api-resources --api-group=extensions.kuadrant.io
+
+oc api-resources --api-group=mcp.kuadrant.io
+
+oc api-resources --api-group=gateway.networking.k8s.io
+NAME                     SHORTNAMES   APIVERSION             NAMESPACED   KIND
+authpolicies                          kuadrant.io/v1         true         AuthPolicy
+dnshealthcheckprobes                  kuadrant.io/v1alpha1   true         DNSHealthCheckProbe
+dnspolicies                           kuadrant.io/v1         true         DNSPolicy
+dnsrecords                            kuadrant.io/v1alpha1   true         DNSRecord
+kuadrantcontrolplanes    kcp          kuadrant.io/v1alpha1   false        KuadrantControlPlane
+kuadrants                             kuadrant.io/v1beta1    true         Kuadrant
+ratelimitpolicies                     kuadrant.io/v1         true         RateLimitPolicy
+tlspolicies                           kuadrant.io/v1         true         TLSPolicy
+tokenratelimitpolicies                kuadrant.io/v1alpha1   true         TokenRateLimitPolicy
+NAME              SHORTNAMES   APIVERSION                       NAMESPACED   KIND
+apikeyapprovals                devportal.kuadrant.io/v1alpha1   true         APIKeyApproval
+apikeyrequests                 devportal.kuadrant.io/v1alpha1   true         APIKeyRequest
+apikeys           apik         devportal.kuadrant.io/v1alpha1   true         APIKey
+apiproducts                    devportal.kuadrant.io/v1alpha1   true         APIProduct
+NAME                SHORTNAMES   APIVERSION                        NAMESPACED   KIND
+oidcpolicies                     extensions.kuadrant.io/v1alpha1   true         OIDCPolicy
+planpolicies                     extensions.kuadrant.io/v1alpha1   true         PlanPolicy
+telemetrypolicies                extensions.kuadrant.io/v1alpha1   true         TelemetryPolicy
+NAME                     SHORTNAMES   APIVERSION           NAMESPACED   KIND
+mcpgatewayextensions     mcpge        mcp.kuadrant.io/v1   true         MCPGatewayExtension
+mcpserverregistrations   mcpsr        mcp.kuadrant.io/v1   true         MCPServerRegistration
+mcpvirtualservers        mcpvs        mcp.kuadrant.io/v1   true         MCPVirtualServer
+NAME              SHORTNAMES   APIVERSION                          NAMESPACED   KIND
+gatewayclasses    gc           gateway.networking.k8s.io/v1        false        GatewayClass
+gateways          gtw          gateway.networking.k8s.io/v1        true         Gateway
+grpcroutes                     gateway.networking.k8s.io/v1        true         GRPCRoute
+httproutes                     gateway.networking.k8s.io/v1        true         HTTPRoute
+referencegrants   refgrant     gateway.networking.k8s.io/v1beta1   true         ReferenceGrant
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 

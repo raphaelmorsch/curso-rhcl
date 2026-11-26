@@ -1,0 +1,371 @@
+raphaelmorsch@ramoreir-mac openbank-lab % export GATEWAY_NS=openbank-gateway
+export GATEWAY_NAME=openbank-gateway
+export GATEWAY_CLASS=openshift-default
+export GATEWAY_HOST=api-openbank.apps.cluster-mbh58.dyn.redhatworkshops.io
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % oc get gatewayclass $GATEWAY_CLASS -o yaml      
+apiVersion: gateway.networking.k8s.io/v1
+kind: GatewayClass
+metadata:
+  creationTimestamp: "2026-11-24T15:02:28Z"
+  finalizers:
+  - openshift.io/ingress-operator-sail-finalizer
+  generation: 1
+  name: openshift-default
+  resourceVersion: "285317"
+  uid: fcd62bb2-fe5f-4264-9231-a525146b2605
+spec:
+  controllerName: openshift.io/gateway-controller/v1
+status:
+  conditions:
+  - lastTransitionTime: "2026-11-24T15:02:40Z"
+    message: Handled by Istio controller
+    observedGeneration: 1
+    reason: Accepted
+    status: "True"
+    type: Accepted
+  - lastTransitionTime: "2026-11-25T12:42:52Z"
+    message: istiod v1.26.8 installed
+    observedGeneration: 1
+    reason: Installed
+    status: "True"
+    type: ControllerInstalled
+  - lastTransitionTime: "2026-11-25T12:42:52Z"
+    message: CRDs updated by CIO
+    observedGeneration: 1
+    reason: ManagedByCIO
+    status: "True"
+    type: CRDsReady
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % oc label namespace openbank-core openbank.io/gateway-access=enabled --overwrite
+namespace/openbank-core labeled
+raphaelmorsch@ramoreir-mac openbank-lab % oc label namespace openbank-partners openbank.io/gateway-access=enabled --overwrite
+namespace/openbank-partners labeled
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % oc get ns -l openbank.io/gateway-access=enabled
+NAME                STATUS   AGE
+openbank-core       Active   174m
+openbank-partners   Active   174m
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % mkdir -p manifests/{gateways,httproutes}
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % cat <<EOF > manifests/gateways/openbank-gateway.yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: ${GATEWAY_NAME}
+  namespace: ${GATEWAY_NS}
+  labels:
+    kuadrant.io/gateway: "true"
+    app.kubernetes.io/part-of: openbank
+spec:
+  gatewayClassName: ${GATEWAY_CLASS}
+  listeners:
+    - name: http
+      hostname: "${GATEWAY_HOST}"
+      port: 80
+      protocol: HTTP
+      allowedRoutes:
+        namespaces:
+          from: Selector
+          selector:
+            matchLabels:
+              openbank.io/gateway-access: enabled
+EOF
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % oc apply --dry-run=server \
+  -f manifests/gateways/openbank-gateway.yaml
+gateway.gateway.networking.k8s.io/openbank-gateway created (server dry run)
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % oc apply \
+  -f manifests/gateways/openbank-gateway.yaml
+gateway.gateway.networking.k8s.io/openbank-gateway created
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % oc get gateway -n openbank-gateway -w
+NAME               CLASS               ADDRESS   PROGRAMMED   AGE
+openbank-gateway   openshift-default             False        9s
+^C%                                                                                                                                                             raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % oc get svc -n openbank-gateway
+NAME                                 TYPE           CLUSTER-IP       EXTERNAL-IP   PORT(S)                        AGE
+openbank-gateway-openshift-default   LoadBalancer   172.31.225.199   <pending>     15021:32742/TCP,80:32654/TCP   3m11s
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % oc get gateway internal-ai-gateway \
+  -n ai-gateway -o yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  annotations:
+    networking.istio.io/service-type: ClusterIP
+  creationTimestamp: "2026-11-24T15:03:03Z"
+  generation: 1
+  labels:
+    istio.io/rev: openshift-gateway
+  name: internal-ai-gateway
+  namespace: ai-gateway
+  resourceVersion: "69042"
+  uid: 86f18f59-8ea5-4cd9-89e7-51466ab2ad20
+spec:
+  gatewayClassName: openshift-default
+  listeners:
+  - allowedRoutes:
+      namespaces:
+        from: All
+    name: internal-http
+    port: 80
+    protocol: HTTP
+status:
+  addresses:
+  - type: Hostname
+    value: internal-ai-gateway-openshift-default.ai-gateway.svc.cluster.local
+  conditions:
+  - lastTransitionTime: "2026-11-24T15:03:03Z"
+    message: Resource accepted
+    observedGeneration: 1
+    reason: Accepted
+    status: "True"
+    type: Accepted
+  - lastTransitionTime: "2026-11-24T15:03:08Z"
+    message: Resource programmed, assigned to service(s) internal-ai-gateway-openshift-default.ai-gateway.svc.cluster.local:80
+    observedGeneration: 1
+    reason: Programmed
+    status: "True"
+    type: Programmed
+  listeners:
+  - attachedRoutes: 2
+    conditions:
+    - lastTransitionTime: "2026-11-24T15:03:03Z"
+      message: No errors found
+      observedGeneration: 1
+      reason: Accepted
+      status: "True"
+      type: Accepted
+    - lastTransitionTime: "2026-11-24T15:03:03Z"
+      message: No errors found
+      observedGeneration: 1
+      reason: NoConflicts
+      status: "False"
+      type: Conflicted
+    - lastTransitionTime: "2026-11-24T15:03:03Z"
+      message: No errors found
+      observedGeneration: 1
+      reason: Programmed
+      status: "True"
+      type: Programmed
+    - lastTransitionTime: "2026-11-24T15:03:03Z"
+      message: No errors found
+      observedGeneration: 1
+      reason: ResolvedRefs
+      status: "True"
+      type: ResolvedRefs
+    name: internal-http
+    supportedKinds:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+    - group: gateway.networking.k8s.io
+      kind: GRPCRoute
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % oc get svc -n ai-gateway
+NAME                                    TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)            AGE
+internal-ai-gateway-openshift-default   ClusterIP   172.31.191.227   <none>        15021/TCP,80/TCP   29h
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % oc annotate gateway.gateway.networking.k8s.io \
+  openbank-gateway \
+  -n openbank-gateway \
+  networking.istio.io/service-type=ClusterIP \
+  --overwrite
+gateway.gateway.networking.k8s.io/openbank-gateway annotated
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % oc get svc -n openbank-gateway
+NAME                                 TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)            AGE
+openbank-gateway-openshift-default   ClusterIP   172.31.225.199   <none>        15021/TCP,80/TCP   4m38s
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % oc get gateway -n openbank-gateway
+NAME               CLASS               ADDRESS                                                                 PROGRAMMED   AGE
+openbank-gateway   openshift-default   openbank-gateway-openshift-default.openbank-gateway.svc.cluster.local   True         4m46s
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % oc get svc customers-api \
+  -n openbank-core -o yaml
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"labels":{"app":"customers-api","app.kubernetes.io/part-of":"openbank"},"name":"customers-api","namespace":"openbank-core"},"spec":{"ports":[{"name":"http","port":8080,"targetPort":"http"}],"selector":{"app":"customers-api"},"type":"ClusterIP"}}
+  creationTimestamp: "2026-11-25T19:16:03Z"
+  labels:
+    app: customers-api
+    app.kubernetes.io/part-of: openbank
+  name: customers-api
+  namespace: openbank-core
+  resourceVersion: "617893"
+  uid: 88f5fa25-94e4-4e98-9f43-0d0557ac4662
+spec:
+  clusterIP: 172.31.187.59
+  clusterIPs:
+  - 172.31.187.59
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - name: http
+    port: 8080
+    protocol: TCP
+    targetPort: http
+  selector:
+    app: customers-api
+  sessionAffinity: None
+  type: ClusterIP
+status:
+  loadBalancer: {}
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % cat <<EOF > manifests/httproutes/customers.yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: customers
+  namespace: openbank-core
+  labels:
+    app: customers-api
+    app.kubernetes.io/part-of: openbank
+spec:
+  parentRefs:
+    - name: ${GATEWAY_NAME}
+      namespace: ${GATEWAY_NS}
+      sectionName: http
+  hostnames:
+    - "${GATEWAY_HOST}"
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /customers
+      backendRefs:
+        - name: customers-api
+          port: 8080
+EOF
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % oc apply --dry-run=server \
+  -f manifests/httproutes/customers.yaml
+
+oc apply \
+  -f manifests/httproutes/customers.yaml
+httproute.gateway.networking.k8s.io/customers created (server dry run)
+httproute.gateway.networking.k8s.io/customers created
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % oc get httproute customers \
+  -n openbank-core \
+  -o json | jq '.status.parents'
+[
+  {
+    "conditions": [
+      {
+        "lastTransitionTime": "2026-11-25T20:38:54Z",
+        "message": "Route was valid",
+        "observedGeneration": 1,
+        "reason": "Accepted",
+        "status": "True",
+        "type": "Accepted"
+      },
+      {
+        "lastTransitionTime": "2026-11-25T20:38:54Z",
+        "message": "All references resolved",
+        "observedGeneration": 1,
+        "reason": "ResolvedRefs",
+        "status": "True",
+        "type": "ResolvedRefs"
+      }
+    ],
+    "controllerName": "openshift.io/gateway-controller/v1",
+    "parentRef": {
+      "group": "gateway.networking.k8s.io",
+      "kind": "Gateway",
+      "name": "openbank-gateway",
+      "namespace": "openbank-gateway",
+      "sectionName": "http"
+    }
+  }
+]
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % oc get gateway openbank-gateway \
+  -n openbank-gateway \
+  -o json | jq '.status.listeners'
+[
+  {
+    "attachedRoutes": 1,
+    "conditions": [
+      {
+        "lastTransitionTime": "2026-11-25T20:29:18Z",
+        "message": "No errors found",
+        "observedGeneration": 1,
+        "reason": "Accepted",
+        "status": "True",
+        "type": "Accepted"
+      },
+      {
+        "lastTransitionTime": "2026-11-25T20:29:18Z",
+        "message": "No errors found",
+        "observedGeneration": 1,
+        "reason": "NoConflicts",
+        "status": "False",
+        "type": "Conflicted"
+      },
+      {
+        "lastTransitionTime": "2026-11-25T20:29:18Z",
+        "message": "No errors found",
+        "observedGeneration": 1,
+        "reason": "Programmed",
+        "status": "True",
+        "type": "Programmed"
+      },
+      {
+        "lastTransitionTime": "2026-11-25T20:29:18Z",
+        "message": "No errors found",
+        "observedGeneration": 1,
+        "reason": "ResolvedRefs",
+        "status": "True",
+        "type": "ResolvedRefs"
+      }
+    ],
+    "name": "http",
+    "supportedKinds": [
+      {
+        "group": "gateway.networking.k8s.io",
+        "kind": "HTTPRoute"
+      },
+      {
+        "group": "gateway.networking.k8s.io",
+        "kind": "GRPCRoute"
+      }
+    ]
+  }
+]
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 

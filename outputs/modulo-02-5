@@ -1,0 +1,136 @@
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % oc get svc -n openbank-gateway
+NAME                                 TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)            AGE
+openbank-gateway-openshift-default   ClusterIP   172.31.225.199   <none>        15021/TCP,80/TCP   28m
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % oc expose svc openbank-gateway-openshift-default \
+  -n openbank-gateway \
+  --name=openbank-public \
+  --port=80 \
+  --hostname=api-openbank.apps.cluster-mbh58.dyn.redhatworkshops.io
+route.route.openshift.io/openbank-public exposed
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % oc get route openbank-public -n openbank-gateway
+NAME              HOST/PORT                                                PATH   SERVICES                             PORT   TERMINATION   WILDCARD
+openbank-public   api-openbank.apps.cluster-mbh58.dyn.redhatworkshops.io          openbank-gateway-openshift-default   80                   None
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % curl -i \
+http://api-openbank.apps.cluster-mbh58.dyn.redhatworkshops.io/customers
+HTTP/1.1 200 OK
+date: Wed, 25 Nov 2026 20:58:31 GMT
+server: uvicorn
+content-length: 222
+content-type: application/json
+x-request-id: e087a459-90e0-4c13-a6f1-d810e21fbc63
+x-api-version: 1.0.0
+x-backend: customers-api-5f667f4d5b-jkdg4
+set-cookie: e6da8c912891ac030d54ac847ed5df3f=6be7eb068238ad948fc94b76876bb92d; path=/; HttpOnly
+
+[{"id":"C001","name":"Maria Silva","segment":"premium","status":"active"},{"id":"C002","name":"Joao Santos","segment":"standard","status":"active"},{"id":"C003","name":"Ana Costa","segment":"standard","status":"inactive"}]%                                                                                                 raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % oc patch httproute customers \
+  -n openbank-core \
+  --type=json \
+  -p='[
+    {
+      "op": "add",
+      "path": "/spec/rules/-",
+      "value": {
+        "matches": [
+          {
+            "path": {
+              "type": "PathPrefix",
+              "value": "/bank/customers"
+            }
+          }
+        ],
+        "filters": [
+          {
+            "type": "URLRewrite",
+            "urlRewrite": {
+              "path": {
+                "type": "ReplacePrefixMatch",
+                "replacePrefixMatch": "/customers"
+              }
+            }
+          }
+        ],
+        "backendRefs": [
+          {
+            "name": "customers-api",
+            "port": 8080
+          }
+        ]
+      }
+    }
+  ]'
+httproute.gateway.networking.k8s.io/customers patched
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % curl -i api-openbank.apps.cluster-mbh58.dyn.redhatworkshops.io/bank/customers/C001 
+HTTP/1.1 200 OK
+date: Wed, 25 Nov 2026 21:00:11 GMT
+server: uvicorn
+content-length: 72
+content-type: application/json
+x-request-id: f9db2640-6a66-4282-a89a-dbdea910cbfa
+x-api-version: 1.0.0
+x-backend: customers-api-5f667f4d5b-jkdg4
+set-cookie: e6da8c912891ac030d54ac847ed5df3f=6be7eb068238ad948fc94b76876bb92d; path=/; HttpOnly
+
+{"id":"C001","name":"Maria Silva","segment":"premium","status":"active"}%                                                                                       raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % oc logs deploy/customers-api \
+  -n openbank-core --tail=10
+{"timestamp": "2026-11-25T20:59:48.895691+00:00", "service": "customers", "version": "1.0.0", "request_id": "98b18bd4-207f-49f0-ac92-7ed19e3c46ed", "method": "GET", "path": "/healthz", "status": 200, "duration_ms": 0.44}
+{"timestamp": "2026-11-25T20:59:53.259954+00:00", "service": "customers", "version": "1.0.0", "request_id": "3e140562-7eba-4da7-b682-5ba983627d31", "method": "GET", "path": "/readyz", "status": 200, "duration_ms": 0.5}
+{"timestamp": "2026-11-25T21:00:03.257632+00:00", "service": "customers", "version": "1.0.0", "request_id": "53274180-ace1-4a67-8182-0ccb3ea445c3", "method": "GET", "path": "/readyz", "status": 200, "duration_ms": 0.59}
+{"timestamp": "2026-11-25T21:00:03.897328+00:00", "service": "customers", "version": "1.0.0", "request_id": "2739349d-e71a-4c2b-bc18-752936cbd4e4", "method": "GET", "path": "/healthz", "status": 200, "duration_ms": 1.1}
+{"timestamp": "2026-11-25T21:00:11.882565+00:00", "service": "customers", "version": "1.0.0", "request_id": "f9db2640-6a66-4282-a89a-dbdea910cbfa", "method": "GET", "path": "/customers/C001", "status": 200, "duration_ms": 0.82}
+{"timestamp": "2026-11-25T21:00:13.257704+00:00", "service": "customers", "version": "1.0.0", "request_id": "952c5352-977f-4f0f-8d6d-0c9e5f00010b", "method": "GET", "path": "/readyz", "status": 200, "duration_ms": 0.49}
+{"timestamp": "2026-11-25T21:00:18.897070+00:00", "service": "customers", "version": "1.0.0", "request_id": "53504ec5-8538-4af6-bfa8-16273bbb2af0", "method": "GET", "path": "/healthz", "status": 200, "duration_ms": 0.92}
+{"timestamp": "2026-11-25T21:00:23.258270+00:00", "service": "customers", "version": "1.0.0", "request_id": "5b5bafbd-7bc0-4b23-b37e-bb9a10f1aa70", "method": "GET", "path": "/readyz", "status": 200, "duration_ms": 0.98}
+{"timestamp": "2026-11-25T21:00:33.257583+00:00", "service": "customers", "version": "1.0.0", "request_id": "4e72bcb9-0319-44c3-8967-d854939af8f8", "method": "GET", "path": "/readyz", "status": 200, "duration_ms": 0.52}
+{"timestamp": "2026-11-25T21:00:33.895475+00:00", "service": "customers", "version": "1.0.0", "request_id": "df1954b8-0ad5-4386-8ffb-4aaa117c7aab", "method": "GET", "path": "/healthz", "status": 200, "duration_ms": 0.55}
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % oc apply -f manifests/httproutes/customers.yaml
+httproute.gateway.networking.k8s.io/customers configured
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % oc get httproute customers \
+  -n openbank-core \
+  -o json | jq '.spec.rules'
+[
+  {
+    "backendRefs": [
+      {
+        "group": "",
+        "kind": "Service",
+        "name": "customers-api",
+        "port": 8080,
+        "weight": 1
+      }
+    ],
+    "matches": [
+      {
+        "path": {
+          "type": "PathPrefix",
+          "value": "/customers"
+        }
+      }
+    ]
+  }
+]
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 

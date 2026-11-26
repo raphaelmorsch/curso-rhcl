@@ -1,0 +1,154 @@
+raphaelmorsch@ramoreir-mac openbank-lab % export GATEWAY_NS=openbank-gateway
+export GATEWAY_NAME=openbank-gateway
+export GATEWAY_HOST=api-openbank.apps.cluster-mbh58.dyn.redhatworkshops.io
+
+export GW_SVC=openbank-gateway-openshift-default
+
+export GW_INTERNAL_URL=http://${GW_SVC}.${GATEWAY_NS}.svc.cluster.local
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % oc whoami
+admin
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % oc exec -n openshift-partners openbank-client -- \
+> curl -i \
+> -H "Host: ${GATEWAY_HOST}" \
+> "${GW_INTERNAL_URL}/customers"
+Error from server (NotFound): namespaces "openshift-partners" not found
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % oc exec -n openbank-partners openbank-client -- \
+curl -i \
+-H "Host: ${GATEWAY_HOST}" \
+"${GW_INTERNAL_URL}/customers" 
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0HTTP/1.1 200 OK
+date: Thu, 26 Nov 2026 12:53:44 GMT
+server: uvicorn
+content-length: 222
+content-type: application/json
+x-request-id: e030a68d-411e-460b-8fed-e8bb44cb1fb1
+x-api-version: 1.0.0
+x-backend: customers-api-5f667f4d5b-jkdg4
+
+[{"id":"C001","name":"Maria Silva","segment":"premium","status":"active"},{"id":"C002","name":"Joao Santos","segment":"standard","status":"active"},{"id":"C003"100   222  100   222    0     0   3363      0 --:--:-- --:--:-- --:--:--  3363
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % oc get svc "$GW_SVC" \
+  -n "$GATEWAY_NS" \
+  -o json | jq '.spec.ports'
+[
+  {
+    "appProtocol": "tcp",
+    "name": "status-port",
+    "port": 15021,
+    "protocol": "TCP",
+    "targetPort": 15021
+  },
+  {
+    "appProtocol": "http",
+    "name": "http",
+    "port": 80,
+    "protocol": "TCP",
+    "targetPort": 80
+  }
+]
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % export GW_PORT_NAME=$(oc get svc "$GW_SVC" \
+  -n "$GATEWAY_NS" \
+  -o json | jq -r '.spec.ports[] |
+  select(.port == 80) | .name')
+
+echo "$GW_PORT_NAME"
+http
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % mkdir -p manifests/exposure
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % cat <<EOF > manifests/exposure/openbank-external.yaml
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: openbank-external
+  namespace: ${GATEWAY_NS}
+  labels:
+    app.kubernetes.io/part-of: openbank
+spec:
+  host: ${GATEWAY_HOST}
+  to:
+    kind: Service
+    name: ${GW_SVC}
+    weight: 100
+  port:
+    targetPort: ${GW_PORT_NAME}
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
+EOF
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % oc get route openbank-external \
+  -n openbank-gateway
+Error from server (NotFound): routes.route.openshift.io "openbank-external" not found
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % oc get route \                  
+  -n openbank-gateway
+NAME              HOST/PORT                                                PATH   SERVICES                             PORT   TERMINATION     WILDCARD
+openbank-public   api-openbank.apps.cluster-mbh58.dyn.redhatworkshops.io          openbank-gateway-openshift-default   http   edge/Redirect   None
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % oc get route openbank-public \  
+  -n openbank-gateway
+NAME              HOST/PORT                                                PATH   SERVICES                             PORT   TERMINATION     WILDCARD
+openbank-public   api-openbank.apps.cluster-mbh58.dyn.redhatworkshops.io          openbank-gateway-openshift-default   http   edge/Redirect   None
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % oc get route openbank-public -n openbank-gateway \
+> -o json | jq '.status.ingress'
+[
+  {
+    "conditions": [
+      {
+        "lastTransitionTime": "2026-11-25T20:58:13Z",
+        "status": "True",
+        "type": "Admitted"
+      }
+    ],
+    "host": "api-openbank.apps.cluster-mbh58.dyn.redhatworkshops.io",
+    "routerCanonicalHostname": "router-default.apps.cluster-mbh58.dyn.redhatworkshops.io",
+    "routerName": "default",
+    "wildcardPolicy": "None"
+  }
+]
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % curl -i "https://${GATEWAY_HOST}/customers"
+HTTP/1.1 200 OK
+date: Thu, 26 Nov 2026 13:02:58 GMT
+server: uvicorn
+content-length: 222
+content-type: application/json
+x-request-id: 01ed112d-92ff-4358-a03c-4a8b20f19098
+x-api-version: 1.0.0
+x-backend: customers-api-5f667f4d5b-jkdg4
+set-cookie: e6da8c912891ac030d54ac847ed5df3f=6be7eb068238ad948fc94b76876bb92d; path=/; HttpOnly; Secure; SameSite=None
+
+[{"id":"C001","name":"Maria Silva","segment":"premium","status":"active"},{"id":"C002","name":"Joao Santos","segment":"standard","status":"active"},{"id":"C003","name":"Ana Costa","segment":"standard","status":"inactive"}]%                                                                                                 raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % curl -s "https://${GATEWAY_HOST}/customers/C001" | jq
+{
+  "id": "C001",
+  "name": "Maria Silva",
+  "segment": "premium",
+  "status": "active"
+}
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 

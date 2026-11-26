@@ -1,0 +1,23 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: openbank-gateway
+  namespace: openbank-gateway
+  annotations:
+    networking.istio.io/service-type: ClusterIP
+  labels:
+    kuadrant.io/gateway: "true"
+    app.kubernetes.io/part-of: openbank
+spec:
+  gatewayClassName: openshift-default
+  listeners:
+    - name: http
+      hostname: api-openbank.apps.cluster-mbh58.dyn.redhatworkshops.io
+      port: 80
+      protocol: HTTP
+      allowedRoutes:
+        namespaces:
+          from: Selector
+          selector:
+            matchLabels:
+              openbank.io/gateway-access: enabled

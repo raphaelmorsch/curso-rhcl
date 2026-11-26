@@ -1,0 +1,90 @@
+raphaelmorsch@ramoreir-mac openbank-lab % oc get svc -n openbank-gateway --show-labels
+NAME                                 TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)            AGE   LABELS
+openbank-gateway-openshift-default   ClusterIP   172.31.225.199   <none>        15021/TCP,80/TCP   13m   gateway.istio.io/managed=openshift.io-gateway-controller-v1,gateway.networking.k8s.io/gateway-name=openbank-gateway
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % export GW_SVC=$(oc get svc \
+  -n openbank-gateway \
+  -l gateway.networking.k8s.io/gateway-name=openbank-gateway \
+  -o jsonpath='{.items[0].metadata.name}')
+
+echo "$GW_SVC"
+openbank-gateway-openshift-default
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % oc get svc "$GW_SVC" \
+  -n openbank-gateway \
+  -o json | jq '.spec.ports'
+[
+  {
+    "appProtocol": "tcp",
+    "name": "status-port",
+    "port": 15021,
+    "protocol": "TCP",
+    "targetPort": 15021
+  },
+  {
+    "appProtocol": "http",
+    "name": "http",
+    "port": 80,
+    "protocol": "TCP",
+    "targetPort": 80
+  }
+]
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % oc port-forward \
+  -n openbank-gateway \
+  svc/"$GW_SVC" 18080:80
+Forwarding from 127.0.0.1:18080 -> 80
+Forwarding from [::1]:18080 -> 80
+Handling connection for 18080
+Handling connection for 18080
+Handling connection for 18080
+Handling connection for 18080
+
+Last login: Sat Nov 21 12:28:09 on ttys000
+(base) raphaelmorsch@ramoreir-mac openbank-lab % curl -i \
+  -H "Host: api-openbank.apps.cluster-mbh58.dyn.redhatworkshops.io" \
+  http://127.0.0.1:18080/customers
+HTTP/1.1 200 OK
+date: Wed, 25 Nov 2026 20:43:40 GMT
+server: uvicorn
+content-length: 222
+content-type: application/json
+x-request-id: a3899dac-21d8-4c5b-94e7-6ccf39cf9894
+x-api-version: 1.0.0
+x-backend: customers-api-5f667f4d5b-jkdg4
+
+[{"id":"C001","name":"Maria Silva","segment":"premium","status":"active"},{"id":"C002","name":"Joao Santos","segment":"standard","status":"active"},{"id":"C003","name":"Ana Costa","segment":"standard","status":"inactive"}]%                                                                                                 (base) raphaelmorsch@ramoreir-mac openbank-lab % 
+(base) raphaelmorsch@ramoreir-mac openbank-lab % 
+(base) raphaelmorsch@ramoreir-mac openbank-lab % 
+(base) raphaelmorsch@ramoreir-mac openbank-lab % curl -s \
+  -H "Host: api-openbank.apps.cluster-mbh58.dyn.redhatworkshops.io" \
+  http://127.0.0.1:18080/customers/C001 | jq
+{
+  "id": "C001",
+  "name": "Maria Silva",
+  "segment": "premium",
+  "status": "active"
+}
+(base) raphaelmorsch@ramoreir-mac openbank-lab % 
+(base) raphaelmorsch@ramoreir-mac openbank-lab % 
+(base) raphaelmorsch@ramoreir-mac openbank-lab % curl -i \
+  -H "Host: api-openbank.apps.cluster-mbh58.dyn.redhatworkshops.io" \
+  http://127.0.0.1:18080/accounts
+HTTP/1.1 404 Not Found
+date: Wed, 25 Nov 2026 20:44:45 GMT
+content-length: 0
+
+(base) raphaelmorsch@ramoreir-mac openbank-lab % 
+(base) raphaelmorsch@ramoreir-mac openbank-lab % 
+(base) raphaelmorsch@ramoreir-mac openbank-lab % curl -i \
+  -H "Host: invalid.openbank.example" \
+  http://127.0.0.1:18080/customers
+HTTP/1.1 404 Not Found
+date: Wed, 25 Nov 2026 20:44:56 GMT
+content-length: 0
+
+(base) raphaelmorsch@ramoreir-mac openbank-lab % 
+(base) raphaelmorsch@ramoreir-mac openbank-lab % 

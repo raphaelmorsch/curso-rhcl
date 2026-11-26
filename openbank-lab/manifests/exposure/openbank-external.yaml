@@ -1,0 +1,18 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: openbank-public
+  namespace: openbank-gateway
+  labels:
+    app.kubernetes.io/part-of: openbank
+spec:
+  host: api-openbank-public.apps.cluster-mbh58.dyn.redhatworkshops.io
+  to:
+    kind: Service
+    name: openbank-gateway-openshift-default
+    weight: 100
+  port:
+    targetPort: http
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
