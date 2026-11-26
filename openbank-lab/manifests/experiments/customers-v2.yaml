@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: customers-api-v2
+  namespace: openbank-core
+  labels:
+    app: customers-api-v2
+    app.kubernetes.io/part-of: openbank
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: customers-api-v2
+  template:
+    metadata:
+      labels:
+        app: customers-api-v2
+        version: v2
+    spec:
+      containers:
+        - name: api
+          image: image-registry.openshift-image-registry.svc:5000/openbank-core/openbank-api:1.0
+          imagePullPolicy: Always
+          env:
+            - name: API_TYPE
+              value: customers
+            - name: API_VERSION
+              value: "2.0.0"
+          ports:
+            - name: http
+              containerPort: 8080
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: http
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: customers-api-v2
+  namespace: openbank-core
+spec:
+  selector:
+    app: customers-api-v2
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
+  type: ClusterIP

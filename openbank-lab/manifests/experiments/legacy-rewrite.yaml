@@ -1,0 +1,29 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: legacy-rewrite
+  namespace: openbank-core
+  labels:
+    app: legacy-api
+    app.kubernetes.io/part-of: openbank
+spec:
+  parentRefs:
+    - name: openbank-gateway
+      namespace: openbank-gateway
+      sectionName: http
+  hostnames:
+    - "api-openbank.apps.cluster-mbh58.dyn.redhatworkshops.io"
+  rules:
+    - matches:
+        - path:
+            type: Exact
+            value: /banking/v1/legacy
+      filters:
+        - type: URLRewrite
+          urlRewrite:
+            path:
+              type: ReplaceFullPath
+              replaceFullPath: /legacy
+      backendRefs:
+        - name: legacy-api
+          port: 8080
