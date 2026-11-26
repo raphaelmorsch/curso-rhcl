@@ -1,0 +1,97 @@
+raphaelmorsch@ramoreir-mac openbank-lab % curl -s "${BASE_URL}/legacy" | jq
+{
+  "system": "OpenBank Mainframe Simulator",
+  "protocol": "HTTP",
+  "version": "1.0.0",
+  "request_path": "/legacy",
+  "channel": "unknown"
+}
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % curl -s "${BASE_URL}/legacy" \
+  -H 'X-Bank-Channel: mobile' | jq
+{
+  "system": "OpenBank Mainframe Simulator",
+  "protocol": "HTTP",
+  "version": "1.0.0",
+  "request_path": "/legacy",
+  "channel": "mobile"
+}
+raphaelmorsch@ramoreir-mac openbank-lab % oc apply -f manifests/httproutes/legacy.yaml 
+httproute.gateway.networking.k8s.io/legacy configured
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % oc get httproute legacy \
+  -n openbank-core \
+  -o json | jq '.status.parents'
+[
+  {
+    "conditions": [
+      {
+        "lastTransitionTime": "2026-11-26T13:08:20Z",
+        "message": "Route was valid",
+        "observedGeneration": 2,
+        "reason": "Accepted",
+        "status": "True",
+        "type": "Accepted"
+      },
+      {
+        "lastTransitionTime": "2026-11-26T13:08:20Z",
+        "message": "All references resolved",
+        "observedGeneration": 2,
+        "reason": "ResolvedRefs",
+        "status": "True",
+        "type": "ResolvedRefs"
+      }
+    ],
+    "controllerName": "openshift.io/gateway-controller/v1",
+    "parentRef": {
+      "group": "gateway.networking.k8s.io",
+      "kind": "Gateway",
+      "name": "openbank-gateway",
+      "namespace": "openbank-gateway",
+      "sectionName": "http"
+    }
+  }
+]
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % curl -i "${BASE_URL}/legacy"
+HTTP/1.1 200 OK
+date: Thu, 26 Nov 2026 14:53:18 GMT
+server: uvicorn
+content-length: 132
+content-type: application/json
+x-request-id: 8736d85f-7bdd-413f-a79a-be33a81a10db
+x-api-version: 1.0.0
+x-backend: legacy-api-58d94cfbfb-29kln
+x-openbank-gateway: managed
+set-cookie: e6da8c912891ac030d54ac847ed5df3f=6be7eb068238ad948fc94b76876bb92d; path=/; HttpOnly; Secure; SameSite=None
+
+{"system":"OpenBank Mainframe Simulator","protocol":"HTTP","version":"1.0.0","request_path":"/legacy","channel":"connectivity-link"}%                                                           raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % curl -s "${BASE_URL}/legacy" \
+  -H 'X-Bank-Channel: fake-channel' | jq
+{
+  "system": "OpenBank Mainframe Simulator",
+  "protocol": "HTTP",
+  "version": "1.0.0",
+  "request_path": "/legacy",
+  "channel": "fake-channel"
+}
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % oc apply -f manifests/httproutes/legacy.yaml
+httproute.gateway.networking.k8s.io/legacy configured
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % curl -s "${BASE_URL}/legacy" \              
+  -H 'X-Bank-Channel: fake-channel' | jq
+{
+  "system": "OpenBank Mainframe Simulator",
+  "protocol": "HTTP",
+  "version": "1.0.0",
+  "request_path": "/legacy",
+  "channel": "connectivity-link"
+}
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 

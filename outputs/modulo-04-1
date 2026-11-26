@@ -1,0 +1,74 @@
+raphaelmorsch@ramoreir-mac openbank-lab % echo $GATEWAY_HOST 
+api-openbank.apps.cluster-mbh58.dyn.redhatworkshops.io
+raphaelmorsch@ramoreir-mac openbank-lab % export BASE_URL=https://${GATEWAY_HOST}
+raphaelmorsch@ramoreir-mac openbank-lab % echo $BASE_URL 
+https://api-openbank.apps.cluster-mbh58.dyn.redhatworkshops.io
+raphaelmorsch@ramoreir-mac openbank-lab % mkdir -p manifests/experiments
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % curl -i "${BASE_URL}/payments"
+HTTP/1.1 405 Method Not Allowed
+date: Thu, 26 Nov 2026 14:35:58 GMT
+server: uvicorn
+allow: POST
+content-length: 31
+content-type: application/json
+x-request-id: 73ac7663-6020-45e5-9a26-1826eab85030
+x-api-version: 1.0.0
+x-backend: payments-api-6579979bfb-srvns
+set-cookie: e6da8c912891ac030d54ac847ed5df3f=6be7eb068238ad948fc94b76876bb92d; path=/; HttpOnly; Secure; SameSite=None
+
+{"detail":"Method Not Allowed"}%                                                                                                                                                                raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % curl -i -X POST \
+  "${BASE_URL}/payments" \
+  -H 'Content-Type: application/json' \
+  -H 'X-Request-ID: lab04-payment-001' \
+  -d '{
+    "account_id": "A001",
+    "amount": 100,
+    "currency": "BRL"
+  }'
+HTTP/1.1 200 OK
+date: Thu, 26 Nov 2026 14:36:40 GMT
+server: uvicorn
+content-length: 186
+content-type: application/json
+x-request-id: ece27976-c2d2-41f9-a434-87cfe25d1539
+x-api-version: 1.0.0
+x-backend: payments-api-6579979bfb-srvns
+set-cookie: e6da8c912891ac030d54ac847ed5df3f=6be7eb068238ad948fc94b76876bb92d; path=/; HttpOnly; Secure; SameSite=None
+
+{"payment_id":"d759fa9c-31f1-4908-a660-ef26ba0e4c43","status":"approved","amount":100.0,"currency":"BRL","fraud_check":{"account_id":"A001","risk_score":10,"risk":"low","approved":true}}%     raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % oc apply -f manifests/httproutes/payments.yaml 
+httproute.gateway.networking.k8s.io/payments configured
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % curl -i "${BASE_URL}/payments"
+HTTP/1.1 404 Not Found
+date: Thu, 26 Nov 2026 14:41:15 GMT
+content-length: 0
+set-cookie: e6da8c912891ac030d54ac847ed5df3f=6be7eb068238ad948fc94b76876bb92d; path=/; HttpOnly; Secure; SameSite=None
+
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % curl -i -X POST \
+  "${BASE_URL}/payments" \
+  -H 'Content-Type: application/json' \
+  -d '{"account_id":"A001","amount":100}'
+HTTP/1.1 200 OK
+date: Thu, 26 Nov 2026 14:41:58 GMT
+server: uvicorn
+content-length: 186
+content-type: application/json
+x-request-id: 5adca1d7-4049-4edb-b4c0-f3c56deb8748
+x-api-version: 1.0.0
+x-backend: payments-api-6579979bfb-srvns
+set-cookie: e6da8c912891ac030d54ac847ed5df3f=6be7eb068238ad948fc94b76876bb92d; path=/; HttpOnly; Secure; SameSite=None
+
+{"payment_id":"f12a790b-6f87-40e5-a055-f042d1711502","status":"approved","amount":100.0,"currency":"BRL","fraud_check":{"account_id":"A001","risk_score":10,"risk":"low","approved":true}}%     raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % oc logs deployments/payments-api -n openshift-core | grep lab04-payment-001
+error: error from server (NotFound): namespaces "openshift-core" not found in namespace "openshift-core"
+raphaelmorsch@ramoreir-mac openbank-lab % oc logs deployments/payments-api -n openbank-core | grep lab04-payment-001
+raphaelmorsch@ramoreir-mac openbank-lab % oc logs deployments/payments-api -n openbank-core       

@@ -14,7 +14,18 @@ spec:
   hostnames:
     - "api-openbank.apps.cluster-mbh58.dyn.redhatworkshops.io"
   rules:
-    - matches:
+    - filters:
+        - type: RequestHeaderModifier
+          requestHeaderModifier:
+            set:
+              - name: X-Bank-Channel
+                value: "connectivity-link"
+        - type: ResponseHeaderModifier
+          responseHeaderModifier:
+            set:
+              - name: X-OpenBank-Gateway
+                value: "managed"
+      matches:
         - path:
             type: PathPrefix
             value: /legacy
