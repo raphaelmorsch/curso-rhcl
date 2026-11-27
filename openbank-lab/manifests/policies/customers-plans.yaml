@@ -1,0 +1,37 @@
+apiVersion: extensions.kuadrant.io/v1alpha1
+kind: PlanPolicy
+metadata:
+  name: customers-plans
+  namespace: openbank-core
+spec:
+  targetRef:
+    group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    name: customers
+  plans:
+    - tier: bronze
+      predicate: |
+        has(auth.identity) &&
+        auth.identity.metadata.annotations["secret.kuadrant.io/plan-id"] == "bronze"
+      limits:
+        custom:
+          - limit: 5
+            window: "1m"
+
+    - tier: silver
+      predicate: |
+        has(auth.identity) &&
+        auth.identity.metadata.annotations["secret.kuadrant.io/plan-id"] == "silver"
+      limits:
+        custom:
+          - limit: 20
+            window: "1m"
+
+    - tier: gold
+      predicate: |
+        has(auth.identity) &&
+        auth.identity.metadata.annotations["secret.kuadrant.io/plan-id"] == "gold"
+      limits:
+        custom:
+          - limit: 100
+            window: "1m"

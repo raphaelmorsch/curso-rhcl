@@ -1,0 +1,461 @@
+raphaelmorsch@ramoreir-mac openbank-lab % cat <<EOF > manifests/policies/customers-auth.yaml
+heredoc> apiVersion: kuadrant.io/v1
+kind: AuthPolicy
+metadata:
+  name: customers-auth
+  namespace: openbank-core
+spec:
+  targetRef:
+    group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    name: customers
+  rules:
+    authentication:
+      api-key-users:
+        apiKey:
+          allNamespaces: true
+          selector:
+            matchLabels:
+              kuadrant.io/apikey: "true"
+              devportal.kuadrant.io/apikey-namespace: openbank-core
+        credentials:
+          authorizationHeader:
+            prefix: APIKEY
+heredoc> EOF
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % oc apply -f manifests/policies/customers-auth.yaml 
+authpolicy.kuadrant.io/customers-auth created
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % cat <<EOF > manifests/policies/customers-plans.yaml
+heredoc> apiVersion: extensions.kuadrant.io/v1alpha1
+kind: PlanPolicy
+metadata:
+  name: customers-plans
+  namespace: openbank-core
+spec:
+  targetRef:
+    group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    name: customers
+  plans:
+    - tier: bronze
+      predicate: |
+        has(auth.identity) &&
+        auth.identity.metadata.annotations["secret.kuadrant.io/plan-id"] == "bronze"
+      limits:
+        custom:
+          - limit: 5
+            window: "1m"
+
+    - tier: silver
+      predicate: |
+        has(auth.identity) &&
+        auth.identity.metadata.annotations["secret.kuadrant.io/plan-id"] == "silver"
+      limits:
+        custom:
+          - limit: 20
+            window: "1m"
+
+    - tier: gold
+      predicate: |
+        has(auth.identity) &&
+        auth.identity.metadata.annotations["secret.kuadrant.io/plan-id"] == "gold"
+      limits:
+        custom:
+          - limit: 100
+            window: "1m"
+heredoc> EOF
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % oc apply -f manifests/policies/customers-plans.yaml 
+planpolicy.extensions.kuadrant.io/customers-plans created
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % oc get apiproduct openbank-customers-api-9175 \
+  -n openbank-core -o json | \
+  jq '.status.conditions[] | {type,status,reason,message}'
+{
+  "type": "PlanPolicyDiscovered",
+  "status": "True",
+  "reason": "Found",
+  "message": "Discovered PlanPolicy customers-plans targeting HTTPRoute customers"
+}
+{
+  "type": "AuthPolicyDiscovered",
+  "status": "True",
+  "reason": "Found",
+  "message": "Discovered AuthPolicy customers-auth targeting HTTPRoute customers"
+}
+{
+  "type": "OIDCDiscovered",
+  "status": "False",
+  "reason": "NoOIDCAuth",
+  "message": "No JWT/OIDC authentication configured in AuthPolicy"
+}
+{
+  "type": "Ready",
+  "status": "True",
+  "reason": "HTTPRouteAccepted",
+  "message": "HTTPRoute openbank-core/customers accepted"
+}
+{
+  "type": "OpenAPISpecReady",
+  "status": "True",
+  "reason": "SpecFetched",
+  "message": "OpenAPI spec was successfully fetched"
+}
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % oc auth can-i create apikeys.devportal.kuadrant.io \
+  --as=user2 -n openbank-partners
+yes
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % oc auth can-i list apiprodutcts --as=user2
+Warning: the server doesn't have a resource type 'apiprodutcts'
+
+no
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % oc get apiproduct
+No resources found in default namespace.
+raphaelmorsch@ramoreir-mac openbank-lab % oc get apiproduct -A
+NAMESPACE       NAME                          AGE
+openbank-core   openbank-customers-api-9175   14h
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % oc auth can-i list apiprodutct --as=user2 -A
+Warning: the server doesn't have a resource type 'apiprodutct'
+
+no
+raphaelmorsch@ramoreir-mac openbank-lab % oc auth can-i list apiprodutcts --as=user2 -A
+Warning: the server doesn't have a resource type 'apiprodutcts'
+
+no
+raphaelmorsch@ramoreir-mac openbank-lab % oc auth can-i get apiprodutcts --as=user2 -A
+Warning: the server doesn't have a resource type 'apiprodutcts'
+
+no
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % oc get apiprodutcts
+error: the server doesn't have a resource type "apiprodutcts"
+raphaelmorsch@ramoreir-mac openbank-lab % oc get apiprodutcts -A
+error: the server doesn't have a resource type "apiprodutcts"
+raphaelmorsch@ramoreir-mac openbank-lab % oc get apiprodutct -A 
+error: the server doesn't have a resource type "apiprodutct"
+raphaelmorsch@ramoreir-mac openbank-lab % oc auth can-i get apiproduct --as=user2 -A 
+yes
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % oc get apikeys -n openbank-partners~  
+No resources found in openbank-partners~ namespace.
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % oc get apikeyrequests -n openbank-core
+NAME                                                  AGE
+openbank-partners-fintech-customers-lookup-74749427   45s
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % oc get apikeyapprovals -n openbank-core
+No resources found in openbank-core namespace.
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % oc get apikeys -n openbank-partners~  
+No resources found in openbank-partners~ namespace.
+raphaelmorsch@ramoreir-mac openbank-lab % oc get apikeys -A                   
+NAMESPACE           NAME                       APPROVED   API                           PLAN     USER    AGE
+openbank-partners   fintech-customers-lookup   True       openbank-customers-api-9175   silver   user2   2m29s
+raphaelmorsch@ramoreir-mac openbank-lab % oc get apikeys -n openbank-partners 
+NAME                       APPROVED   API                           PLAN     USER    AGE
+fintech-customers-lookup   True       openbank-customers-api-9175   silver   user2   2m39s
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % curl -i "${BASE_URL}/customers"
+HTTP/1.1 401 Unauthorized
+www-authenticate: APIKEY realm="api-key-users"
+x-ext-auth-reason: credential not found
+date: Fri, 27 Nov 2026 12:39:32 GMT
+content-length: 0
+set-cookie: e6da8c912891ac030d54ac847ed5df3f=6be7eb068238ad948fc94b76876bb92d; path=/; HttpOnly; Secure; SameSite=None
+
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % curl -i "${BASE_URL}/customers" \
+  -H 'Authorization: Bearer invalid-openbank-key'
+HTTP/1.1 401 Unauthorized
+www-authenticate: APIKEY realm="api-key-users"
+x-ext-auth-reason: credential not found
+date: Fri, 27 Nov 2026 12:39:45 GMT
+content-length: 0
+set-cookie: e6da8c912891ac030d54ac847ed5df3f=6be7eb068238ad948fc94b76876bb92d; path=/; HttpOnly; Secure; SameSite=None
+
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % read -s "API_KEY?OpenBank API Key: "
+echo
+OpenBank API Key: 
+raphaelmorsch@ramoreir-mac openbank-lab % curl -i "${BASE_URL}/customers" \
+  -H "Authorization: Bearer ${API_KEY}"
+HTTP/1.1 401 Unauthorized
+www-authenticate: APIKEY realm="api-key-users"
+x-ext-auth-reason: credential not found
+date: Fri, 27 Nov 2026 12:40:30 GMT
+content-length: 0
+set-cookie: e6da8c912891ac030d54ac847ed5df3f=6be7eb068238ad948fc94b76876bb92d; path=/; HttpOnly; Secure; SameSite=None
+
+raphaelmorsch@ramoreir-mac openbank-lab % echo $API_KEY 
+da5a00fb8de43d6d291b641c094a08b7b88918df7436cd2999d7d4d7bf0626c4
+raphaelmorsch@ramoreir-mac openbank-lab % curl -i "${BASE_URL}/customers" \
+  -H "Authorization: APIKEY ${API_KEY}"
+HTTP/1.1 401 Unauthorized
+www-authenticate: APIKEY realm="api-key-users"
+x-ext-auth-reason: the API Key provided is invalid
+date: Fri, 27 Nov 2026 12:47:24 GMT
+content-length: 0
+set-cookie: e6da8c912891ac030d54ac847ed5df3f=6be7eb068238ad948fc94b76876bb92d; path=/; HttpOnly; Secure; SameSite=None
+
+raphaelmorsch@ramoreir-mac openbank-lab % oc get apikey fintech-customers-lookup \
+  -n openbank-partners -o yaml
+apiVersion: devportal.kuadrant.io/v1alpha1
+kind: APIKey
+metadata:
+  creationTimestamp: "2026-11-27T12:34:59Z"
+  generation: 1
+  name: fintech-customers-lookup
+  namespace: openbank-partners
+  resourceVersion: "2556737"
+  uid: 658b8f92-f0cf-44b7-a135-86a59127cdf6
+spec:
+  apiProductRef:
+    name: openbank-customers-api-9175
+    namespace: openbank-core
+  planTier: silver
+  requestedBy:
+    email: user2@example.com
+    userId: user2
+  secretRef:
+    name: fintech-customers-lookup-secret
+status:
+  apiHostname: api-openbank.apps.cluster-mbh58.dyn.redhatworkshops.io
+  authScheme:
+    authenticationSpec:
+      allNamespaces: true
+      selector:
+        matchLabels:
+          devportal.kuadrant.io/apikey-namespace: openbank-core
+          kuadrant.io/apikey: "true"
+    credentials:
+      authorizationHeader:
+        prefix: APIKEY
+  conditions:
+  - lastTransitionTime: "2026-11-27T12:37:08Z"
+    message: 'API key request approved by user1: Approved'
+    observedGeneration: 1
+    reason: Approved
+    status: "True"
+    type: Approved
+  limits:
+    custom:
+    - limit: 20
+      window: 1m
+  observedGeneration: 1
+raphaelmorsch@ramoreir-mac openbank-lab % oc get secrets -A \
+  -l 'kuadrant.io/apikey=true' \
+  --show-labels
+NAMESPACE         NAME                                                            TYPE     DATA   AGE   LABELS
+kuadrant-system   devportal-openbank-partners-fintech-customers-lookup-74749427   Opaque   1      11m   authorino.kuadrant.io/managed-by=authorino,devportal.kuadrant.io/apikey-namespace=openbank-partners,devportal.kuadrant.io/apikey=fintech-customers-lookup,devportal.kuadrant.io/apiproduct-namespace=openbank-core,devportal.kuadrant.io/apiproduct=openbank-customers-api-9175,devportal.kuadrant.io/enforcement=true,kuadrant.io/apikey=true
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % oc apply -f manifests/policies/customers-auth.yaml 
+authpolicy.kuadrant.io/customers-auth configured
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % curl -i "${BASE_URL}/customers" \                 
+  -H "Authorization: APIKEY ${API_KEY}"
+HTTP/1.1 401 Unauthorized
+www-authenticate: APIKEY realm="api-key-users"
+x-ext-auth-reason: the API Key provided is invalid
+date: Fri, 27 Nov 2026 13:03:22 GMT
+content-length: 0
+set-cookie: e6da8c912891ac030d54ac847ed5df3f=6be7eb068238ad948fc94b76876bb92d; path=/; HttpOnly; Secure; SameSite=None
+
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % oc get secrets -A \
+  -l 'kuadrant.io/apikey=true,devportal.kuadrant.io/enforcement=true,devportal.kuadrant.io/apiproduct-namespace=openbank-core,devportal.kuadrant.io/apiproduct=openbank-customers-api-9175'
+No resources found
+raphaelmorsch@ramoreir-mac openbank-lab % oc get authpolicy customers-auth \
+  -n openbank-core -o json | jq '.status.conditions'
+[
+  {
+    "lastTransitionTime": "2026-11-27T12:20:40Z",
+    "message": "AuthPolicy has been accepted",
+    "reason": "Accepted",
+    "status": "True",
+    "type": "Accepted"
+  },
+  {
+    "lastTransitionTime": "2026-11-27T13:00:13Z",
+    "message": "AuthPolicy has been successfully enforced",
+    "reason": "Enforced",
+    "status": "True",
+    "type": "Enforced"
+  }
+]
+raphaelmorsch@ramoreir-mac openbank-lab % oc get secrets -A | grep fintech-customers-lookup
+openbank-partners                                  fintech-customers-lookup-secret                                 Opaque                                1      30m
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % oc get secrets -n kuadrant-system \
+  -l 'devportal.kuadrant.io/enforcement=true' \
+  --show-labels
+No resources found in kuadrant-system namespace.
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % oc get secrets -A \
+  -l 'devportal.kuadrant.io/apikey=fintech-customers-lookup' \
+  --show-labels
+No resources found
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % oc get apikey fintech-customers-lookup \
+  -n openbank-partners -o json | jq '.status'
+{
+  "apiHostname": "api-openbank.apps.cluster-mbh58.dyn.redhatworkshops.io",
+  "authScheme": {
+    "authenticationSpec": {
+      "allNamespaces": true,
+      "selector": {
+        "matchLabels": {
+          "devportal.kuadrant.io/apikey-namespace": "openbank-core",
+          "devportal.kuadrant.io/apiproduct": "openbank-customers-api-9175",
+          "devportal.kuadrant.io/enforcement": "true",
+          "kuadrant.io/apikey": "true"
+        }
+      }
+    },
+    "credentials": {
+      "authorizationHeader": {
+        "prefix": "APIKEY"
+      }
+    }
+  },
+  "conditions": [
+    {
+      "lastTransitionTime": "2026-11-27T13:00:13Z",
+      "message": "API key request is awaiting approval",
+      "observedGeneration": 1,
+      "reason": "AwaitingApproval",
+      "status": "True",
+      "type": "Pending"
+    }
+  ],
+  "limits": {
+    "custom": [
+      {
+        "limit": 20,
+        "window": "1m"
+      }
+    ]
+  },
+  "observedGeneration": 1
+}
+raphaelmorsch@ramoreir-mac openbank-lab % curl -i "${BASE_URL}/customers" \                
+  -H "Authorization: APIKEY ${API_KEY}"
+curl: (6) Could not resolve host: api-openbank.apps.cluster-mbh58.dyn.redhatworkshops.io
+raphaelmorsch@ramoreir-mac openbank-lab % curl -i "${BASE_URL}/customers" \
+  -H "Authorization: APIKEY ${API_KEY}"
+HTTP/1.1 401 Unauthorized
+www-authenticate: APIKEY realm="api-key-users"
+x-ext-auth-reason: the API Key provided is invalid
+date: Fri, 27 Nov 2026 13:12:14 GMT
+content-length: 0
+set-cookie: e6da8c912891ac030d54ac847ed5df3f=6be7eb068238ad948fc94b76876bb92d; path=/; HttpOnly; Secure; SameSite=None
+
+raphaelmorsch@ramoreir-mac openbank-lab % oc get apikey fintech-customers-lookup \
+  -n openbank-partners -o json | jq '.status'
+{
+  "apiHostname": "api-openbank.apps.cluster-mbh58.dyn.redhatworkshops.io",
+  "authScheme": {
+    "authenticationSpec": {
+      "allNamespaces": true,
+      "selector": {
+        "matchLabels": {
+          "devportal.kuadrant.io/apikey-namespace": "openbank-core",
+          "devportal.kuadrant.io/apiproduct": "openbank-customers-api-9175",
+          "devportal.kuadrant.io/enforcement": "true",
+          "kuadrant.io/apikey": "true"
+        }
+      }
+    },
+    "credentials": {
+      "authorizationHeader": {
+        "prefix": "APIKEY"
+      }
+    }
+  },
+  "conditions": [
+    {
+      "lastTransitionTime": "2026-11-27T13:07:41Z",
+      "message": "API key request approved by user1: Approved",
+      "observedGeneration": 1,
+      "reason": "Approved",
+      "status": "True",
+      "type": "Approved"
+    }
+  ],
+  "limits": {
+    "custom": [
+      {
+        "limit": 20,
+        "window": "1m"
+      }
+    ]
+  },
+  "observedGeneration": 1
+}
+raphaelmorsch@ramoreir-mac openbank-lab % curl -i "${BASE_URL}/customers" \       
+  -H "Authorization: APIKEY ${API_KEY}"      
+HTTP/1.1 401 Unauthorized
+www-authenticate: APIKEY realm="api-key-users"
+x-ext-auth-reason: the API Key provided is invalid
+date: Fri, 27 Nov 2026 13:12:58 GMT
+content-length: 0
+set-cookie: e6da8c912891ac030d54ac847ed5df3f=6be7eb068238ad948fc94b76876bb92d; path=/; HttpOnly; Secure; SameSite=None
+
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % oc apply -f manifests/policies/customers-auth.yaml 
+authpolicy.kuadrant.io/customers-auth configured
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % curl -i "${BASE_URL}/customers" \                 
+  -H "Authorization: APIKEY ${API_KEY}"
+HTTP/1.1 200 OK
+date: Fri, 27 Nov 2026 13:15:12 GMT
+server: uvicorn
+content-length: 222
+content-type: application/json
+x-request-id: 0569093d-6c13-460a-9e0a-65c61a368640
+x-api-version: 1.0.0
+x-backend: customers-api-5f667f4d5b-jkdg4
+set-cookie: e6da8c912891ac030d54ac847ed5df3f=6be7eb068238ad948fc94b76876bb92d; path=/; HttpOnly; Secure; SameSite=None
+
+[{"id":"C001","name":"Maria Silva","segment":"premium","status":"active"},{"id":"C002","name":"Joao Santos","segment":"standard","status":"active"},{"id":"C003","name":"Ana Costa","segment":"standard","status":"inactive"}]%                                                                                           raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % curl -i "${BASE_URL}/customers" \
+  -H "Authorization: APIKEY ${API_KEY}"
+HTTP/1.1 401 Unauthorized
+www-authenticate: APIKEY realm="api-key-users"
+x-ext-auth-reason: the API Key provided is invalid
+date: Fri, 27 Nov 2026 13:19:12 GMT
+content-length: 0
+set-cookie: e6da8c912891ac030d54ac847ed5df3f=6be7eb068238ad948fc94b76876bb92d; path=/; HttpOnly; Secure; SameSite=None
+
+raphaelmorsch@ramoreir-mac openbank-lab % 

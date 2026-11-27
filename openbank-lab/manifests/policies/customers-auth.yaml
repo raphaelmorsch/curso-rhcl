@@ -1,0 +1,24 @@
+apiVersion: kuadrant.io/v1
+kind: AuthPolicy
+metadata:
+  name: customers-auth
+  namespace: openbank-core
+spec:
+  targetRef:
+    group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    name: customers
+  rules:
+    authentication:
+      api-key-users:
+        apiKey:
+          allNamespaces: true
+          selector:
+            matchLabels:
+              kuadrant.io/apikey: "true"
+              devportal.kuadrant.io/apiproduct-namespace: openbank-core
+              devportal.kuadrant.io/enforcement: "true"
+              devportal.kuadrant.io/apiproduct: openbank-customers-api-9175
+        credentials:
+          authorizationHeader:
+            prefix: APIKEY

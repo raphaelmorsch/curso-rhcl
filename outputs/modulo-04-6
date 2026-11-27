@@ -1,0 +1,208 @@
+raphaelmorsch@ramoreir-mac openbank-lab % cat <<EOF > manifests/experiments/customers-canary.yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: customers
+  namespace: openbank-core
+spec:
+  parentRefs:
+    - name: openbank-gateway
+      namespace: openbank-gateway
+      sectionName: http
+  hostnames:
+    - "${GATEWAY_HOST}"
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /customers
+      backendRefs:
+        - name: customers-api
+          port: 8080
+          weight: 90
+
+        - name: customers-api-v2
+          port: 8080
+          weight: 10
+EOF
+
+oc apply -f manifests/experiments/customers-canary.yaml
+httproute.gateway.networking.k8s.io/customers configured
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % oc get httproute customers \
+  -n openbank-core -o json | jq '{
+    generation: .metadata.generation,
+    rules: .spec.rules,
+    parents: .status.parents
+  }'
+{
+  "generation": 5,
+  "rules": [
+    {
+      "backendRefs": [
+        {
+          "group": "",
+          "kind": "Service",
+          "name": "customers-api",
+          "port": 8080,
+          "weight": 90
+        },
+        {
+          "group": "",
+          "kind": "Service",
+          "name": "customers-api-v2",
+          "port": 8080,
+          "weight": 10
+        }
+      ],
+      "matches": [
+        {
+          "path": {
+            "type": "PathPrefix",
+            "value": "/customers"
+          }
+        }
+      ]
+    }
+  ],
+  "parents": [
+    {
+      "conditions": [
+        {
+          "lastTransitionTime": "2026-11-25T20:38:54Z",
+          "message": "Route was valid",
+          "observedGeneration": 5,
+          "reason": "Accepted",
+          "status": "True",
+          "type": "Accepted"
+        },
+        {
+          "lastTransitionTime": "2026-11-25T20:38:54Z",
+          "message": "All references resolved",
+          "observedGeneration": 5,
+          "reason": "ResolvedRefs",
+          "status": "True",
+          "type": "ResolvedRefs"
+        }
+      ],
+      "controllerName": "openshift.io/gateway-controller/v1",
+      "parentRef": {
+        "group": "gateway.networking.k8s.io",
+        "kind": "Gateway",
+        "name": "openbank-gateway",
+        "namespace": "openbank-gateway",
+        "sectionName": "http"
+      }
+    }
+  ]
+}
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % for i in $(seq 1 200)
+do
+  curl -fsS \
+    --max-time 10 \
+    -D - -o /dev/null \
+    "${BASE_URL}/customers" \
+    | awk 'tolower($1)=="x-api-version:" {
+        gsub(/\r/, "", $2)
+        print $2
+      }'
+done | sort | uniq -c
+
+ 177 1.0.0
+  23 2.0.0
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % oc patch httproute customers \
+  -n openbank-core \
+  --type=json \
+  -p='[
+    {
+      "op": "replace",
+      "path": "/spec/rules/0/backendRefs/0/weight",
+      "value": 50
+    },
+    {
+      "op": "replace",
+      "path": "/spec/rules/0/backendRefs/1/weight",
+      "value": 50
+    }
+  ]'
+httproute.gateway.networking.k8s.io/customers patched
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % oc get httproute -n openbank-core | grep customer
+customers   ["api-openbank.apps.cluster-mbh58.dyn.redhatworkshops.io"]   21h
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % for i in $(seq 1 200)                            
+do                  
+  curl -fsS \  
+    --max-time 10 \
+    -D - -o /dev/null \
+    "${BASE_URL}/customers" \
+    | awk 'tolower($1)=="x-api-version:" {         
+        gsub(/\r/, "", $2)
+        print $2
+      }'
+done | sort | uniq -c 
+
+
+
+  97 1.0.0
+ 103 2.0.0
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % oc patch httproute customers \
+  -n openbank-core \
+  --type=json \
+  -p='[
+    {
+      "op": "replace",
+      "path": "/spec/rules/0/backendRefs/0/weight",
+      "value": 100
+    },
+    {
+      "op": "replace",
+      "path": "/spec/rules/0/backendRefs/1/weight",
+      "value": 0
+    }
+  ]'
+httproute.gateway.networking.k8s.io/customers patched
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % oc apply -f manifests/experiments/customers-original.json
+httproute.gateway.networking.k8s.io/customers configured
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % 
+raphaelmorsch@ramoreir-mac openbank-lab % oc get httproute customers \
+  -n openbank-core -o json | jq '.spec.rules'
+[
+  {
+    "backendRefs": [
+      {
+        "group": "",
+        "kind": "Service",
+        "name": "customers-api",
+        "port": 8080,
+        "weight": 1
+      }
+    ],
+    "matches": [
+      {
+        "path": {
+          "type": "PathPrefix",
+          "value": "/customers"
+        }
+      }
+    ]
+  }
+]
+raphaelmorsch@ramoreir-mac openbank-lab % 
